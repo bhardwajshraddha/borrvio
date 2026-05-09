@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // Register
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, city, area } = req.body;
+    const { name, email, password, city, area ,phone} = req.body;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -23,7 +23,8 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       city,
-      area
+      area,
+      phone
     });
 
     // Generate token
@@ -78,13 +79,39 @@ const loginUser = async (req, res) => {
       email: user.email,
       city: user.city,
       area: user.area,
+      phone: user.phone,
       trustScore: user.trustScore,
       token
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { registerUser, loginUser };
+// Get Profile
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update Profile
+const updateProfile = async (req, res) => {
+  try {
+    const { name, phone, city, area } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, phone, city, area },
+      { new: true }
+    ).select('-password');
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getProfile, updateProfile };
+  
