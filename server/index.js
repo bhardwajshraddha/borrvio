@@ -18,12 +18,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://borrvio.vercel.app",
-    ],
-    credentials: true,
+    origin: "*",
+    credentials: false,
   }),
 );
 app.use(express.json());
