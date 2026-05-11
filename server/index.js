@@ -21,7 +21,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:3001",
-      "https://borrvio.vercel.app/",
+      "https://borrvio.vercel.app",
     ],
     credentials: true,
   }),
