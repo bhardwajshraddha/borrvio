@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -19,16 +19,8 @@ const RenterDashboard = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchDashboard();
-    fetchBookings();
-  }, []);
-
-  const fetchDashboard = async () => {
+  // ✅ FIX: Wrapped in useCallback with proper deps
+  const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/dashboard/renter",
@@ -40,9 +32,9 @@ const RenterDashboard = () => {
     } catch (error) {
       toast.error("Failed to load dashboard!");
     }
-  };
+  }, [token]);
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/bookings/my",
@@ -56,7 +48,17 @@ const RenterDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  // ✅ FIX: Added all missing dependencies — fetchBookings, fetchDashboard, navigate, token
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    fetchDashboard();
+    fetchBookings();
+  }, [token, navigate, fetchDashboard, fetchBookings]);
 
   const statusColor = (status) => {
     switch (status) {
@@ -74,6 +76,7 @@ const RenterDashboard = () => {
         return "bg-gray-500";
     }
   };
+
   const handlePayment = async (booking) => {
     try {
       const { data } = await axios.post(
@@ -120,6 +123,7 @@ const RenterDashboard = () => {
       toast.error("Payment failed!");
     }
   };
+
   return (
     <div className="min-h-screen bg-[#0f0f1a] text-white">
       {/* Navbar */}

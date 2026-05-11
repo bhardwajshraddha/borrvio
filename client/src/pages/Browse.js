@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -12,23 +12,28 @@ const Browse = () => {
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
 
-  const fetchItems = async () => {
+  // ✅ FIX: Wrapped in useCallback with proper deps so it can be added to useEffect
+  const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("https://borrvio-backend.onrender.com/api/items", {
-        params: { search, category, city },
-      });
+      const { data } = await axios.get(
+        "https://borrvio-backend.onrender.com/api/items",
+        {
+          params: { search, category, city },
+        },
+      );
       setItems(data);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, category, city]);
 
+  // ✅ FIX: Added fetchItems to dependency array
   useEffect(() => {
     fetchItems();
-  }, [search, category, city]);
+  }, [fetchItems]);
 
   return (
     <div className="min-h-screen bg-[#0f0f1a] text-white">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,22 +14,14 @@ const OwnerDashboard = () => {
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [myItems, setMyItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchDashboard();
-    fetchBookings();
-    fetchMyItems();
-  }, []);
-
-  const fetchDashboard = async () => {
+  // ✅ FIX: Wrapped all fetch functions in useCallback with proper deps
+  const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/dashboard/owner",
@@ -41,10 +33,9 @@ const OwnerDashboard = () => {
     } catch (error) {
       toast.error("Failed to load dashboard!");
     }
-  };
-  const [myItems, setMyItems] = useState([]);
+  }, [token]);
 
-  const fetchMyItems = async () => {
+  const fetchMyItems = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/items",
@@ -57,8 +48,9 @@ const OwnerDashboard = () => {
     } catch (error) {
       console.error(error);
     }
-  };
-  const fetchBookings = async () => {
+  }, [token, user._id]);
+
+  const fetchBookings = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/bookings/owner",
@@ -72,7 +64,18 @@ const OwnerDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  // ✅ FIX: Added all missing dependencies
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    fetchDashboard();
+    fetchBookings();
+    fetchMyItems();
+  }, [token, navigate, fetchDashboard, fetchBookings, fetchMyItems]);
 
   const deleteItem = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
@@ -327,6 +330,7 @@ const OwnerDashboard = () => {
             ))}
           </div>
         )}
+
         {/* My Items */}
         <h3 className="text-xl font-bold mb-4 mt-10">My Listed Items</h3>
         {myItems.length === 0 ? (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -19,15 +19,8 @@ const Profile = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  // ✅ FIX: Wrapped in useCallback so it can be safely added to useEffect deps
+  const fetchProfile = useCallback(async () => {
     try {
       const { data } = await axios.get(
         "https://borrvio-backend.onrender.com/api/auth/profile",
@@ -45,7 +38,16 @@ const Profile = () => {
     } catch (error) {
       toast.error("Failed to load profile!");
     }
-  };
+  }, [token]);
+
+  // ✅ FIX: Added all missing dependencies — fetchProfile, navigate, token
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    fetchProfile();
+  }, [token, navigate, fetchProfile]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

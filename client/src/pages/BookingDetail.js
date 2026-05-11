@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -13,27 +13,30 @@ const BookingDetail = () => {
   const [rating, setRating] = useState({ stars: 5, comment: "" });
 
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  // ✅ FIX 1: Removed unused 'user' variable (was: const user = JSON.parse(...))
 
+  // ✅ FIX 2: Wrapped in useCallback so it can be safely added to useEffect deps
+  const fetchBooking = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        `https://borrvio-backend.onrender.com/api/bookings/my`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const found = data.find((b) => b._id === id);
+      setBooking(found);
+    } catch (error) {
+      toast.error("Booking not found!");
+    } finally {
+      setLoading(false);
+    }
+  }, [token, id]);
+
+  // ✅ FIX 2: Added 'token' (via fetchBooking) to dependency array
   useEffect(() => {
-    const fetchBooking = async () => {
-      try {
-        const { data } = await axios.get(
-          `https://borrvio-backend.onrender.com/api/bookings/my`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        const found = data.find((b) => b._id === id);
-        setBooking(found);
-      } catch (error) {
-        toast.error("Booking not found!");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBooking();
-  }, [id]);
+  }, [fetchBooking]);
 
   const handleRating = async () => {
     try {

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiMapPin, FiStar, FiShield, FiCalendar } from "react-icons/fi";
+// ✅ FIX: Removed unused imports — FiMapPin, FiStar, FiShield, FiCalendar
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -18,7 +18,7 @@ const ItemDetail = () => {
   const [endDate, setEndDate] = useState("");
   const [booking, setBooking] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  // ✅ FIX: Removed unused 'isDragging' state variable
   const [startX, setStartX] = useState(0);
   const token = localStorage.getItem("token");
 
@@ -111,12 +111,9 @@ const ItemDetail = () => {
           <div
             className="relative w-full max-w-4xl flex items-center justify-center"
             onMouseDown={(e) => {
-              setIsDragging(true);
               setStartX(e.clientX);
             }}
             onMouseUp={(e) => {
-              setIsDragging(false);
-
               const diff = e.clientX - startX;
 
               if (diff > 50 && imageIndex > 0) {
