@@ -1,26 +1,26 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { FiUpload, FiX } from 'react-icons/fi';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { FiUpload, FiX } from "react-icons/fi";
 
 const AddItem = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    description: '',
-    pricePerDay: '',
-    securityDeposit: '',
-    city: '',
-    area: ''
+    name: "",
+    category: "",
+    description: "",
+    pricePerDay: "",
+    securityDeposit: "",
+    city: "",
+    area: "",
   });
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,7 +29,7 @@ const AddItem = () => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(files);
-    const previewUrls = files.map(file => URL.createObjectURL(file));
+    const previewUrls = files.map((file) => URL.createObjectURL(file));
     setPreviews(previewUrls);
   };
 
@@ -39,51 +39,59 @@ const AddItem = () => {
     setImages(newImages);
     setPreviews(newPreviews);
   };
-      const uploadImages = async () => {
-  const formDataImg = new FormData();
-  images.forEach(image => {
-    formDataImg.append('image', image);
-  });
-  
-  const { data } = await axios.post('http://localhost:5000/api/upload', formDataImg, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-  return data.urls;
-};
+  const uploadImages = async () => {
+    const formDataImg = new FormData();
+    images.forEach((image) => {
+      formDataImg.append("image", image);
+    });
+
+    const { data } = await axios.post(
+      "https://borrvio-backend.onrender.com/api/upload",
+      formDataImg,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return data.urls;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!token) {
-      toast.error('Please login first!');
-      navigate('/login');
+      toast.error("Please login first!");
+      navigate("/login");
       return;
     }
     setLoading(true);
     try {
       let imageUrls = [];
       if (images.length > 0) {
-        toast.loading('Uploading images...');
+        toast.loading("Uploading images...");
         imageUrls = await uploadImages();
         toast.dismiss();
       }
 
-      await axios.post('http://localhost:5000/api/items', {
-        ...formData,
-        pricePerDay: Number(formData.pricePerDay),
-        securityDeposit: Number(formData.securityDeposit),
-        images: imageUrls
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(
+        "https://borrvio-backend.onrender.com/api/items",
+        {
+          ...formData,
+          pricePerDay: Number(formData.pricePerDay),
+          securityDeposit: Number(formData.securityDeposit),
+          images: imageUrls,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-      toast.success('Item listed successfully!');
-      navigate('/browse');
+      toast.success("Item listed successfully!");
+      navigate("/browse");
     } catch (error) {
       toast.dismiss();
-      toast.error(error.response?.data?.message || 'Failed to add item!');
+      toast.error(error.response?.data?.message || "Failed to add item!");
     } finally {
       setLoading(false);
     }
@@ -91,17 +99,16 @@ const AddItem = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f1a] text-white">
-
       {/* Navbar */}
       <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
         <h1
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="text-2xl font-bold text-orange-500 cursor-pointer"
         >
           Borrvio
         </h1>
         <button
-          onClick={() => navigate('/browse')}
+          onClick={() => navigate("/browse")}
           className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
         >
           Back to Browse
@@ -117,13 +124,16 @@ const AddItem = () => {
           className="bg-[#1a1a2e] p-8 rounded-2xl border border-gray-800"
         >
           <h2 className="text-2xl font-bold mb-2">List Your Item</h2>
-          <p className="text-gray-400 mb-8">Fill in the details to list your item for rent</p>
+          <p className="text-gray-400 mb-8">
+            Fill in the details to list your item for rent
+          </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
             {/* Name */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">Item Name</label>
+              <label className="text-gray-400 text-sm mb-1 block">
+                Item Name
+              </label>
               <input
                 type="text"
                 name="name"
@@ -137,7 +147,9 @@ const AddItem = () => {
 
             {/* Category */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">Category</label>
+              <label className="text-gray-400 text-sm mb-1 block">
+                Category
+              </label>
               <select
                 name="category"
                 value={formData.category}
@@ -156,7 +168,9 @@ const AddItem = () => {
 
             {/* Description */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">Description</label>
+              <label className="text-gray-400 text-sm mb-1 block">
+                Description
+              </label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -171,7 +185,9 @@ const AddItem = () => {
             {/* Price + Deposit */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">Price Per Day (₹)</label>
+                <label className="text-gray-400 text-sm mb-1 block">
+                  Price Per Day (₹)
+                </label>
                 <input
                   type="number"
                   name="pricePerDay"
@@ -183,7 +199,9 @@ const AddItem = () => {
                 />
               </div>
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">Security Deposit (₹)</label>
+                <label className="text-gray-400 text-sm mb-1 block">
+                  Security Deposit (₹)
+                </label>
                 <input
                   type="number"
                   name="securityDeposit"
@@ -223,23 +241,29 @@ const AddItem = () => {
                 />
               </div>
             </div>
-              <div>
-  <label className="text-gray-400 text-sm mb-1 block">Pickup Address</label>
-  <input
-    type="text"
-    name="address"
-    value={formData.address}
-    onChange={handleChange}
-    placeholder="e.g. Shop 5, FC Road, Near XYZ Mall"
-    className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-  />
-</div>
+            <div>
+              <label className="text-gray-400 text-sm mb-1 block">
+                Pickup Address
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="e.g. Shop 5, FC Road, Near XYZ Mall"
+                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+              />
+            </div>
             {/* Image Upload */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">Upload Images</label>
+              <label className="text-gray-400 text-sm mb-1 block">
+                Upload Images
+              </label>
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-700 rounded-xl cursor-pointer hover:border-orange-500 transition">
                 <FiUpload className="text-gray-400 text-2xl mb-2" />
-                <span className="text-gray-400 text-sm">Click to upload images</span>
+                <span className="text-gray-400 text-sm">
+                  Click to upload images
+                </span>
                 <input
                   type="file"
                   multiple
@@ -277,9 +301,8 @@ const AddItem = () => {
               disabled={loading}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
             >
-              {loading ? 'Listing Item...' : 'List Item'}
+              {loading ? "Listing Item..." : "List Item"}
             </button>
-
           </form>
         </motion.div>
       </div>

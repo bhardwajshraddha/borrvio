@@ -26,7 +26,7 @@ const ItemDetail = () => {
     const fetchItem = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/items/${id}`,
+          `https://borrvio-backend.onrender.com/api/items/${id}`,
         );
         setItem(data);
       } catch (error) {
@@ -68,7 +68,7 @@ const ItemDetail = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/bookings",
+        "https://borrvio-backend.onrender.com/api/bookings",
         {
           itemId: id,
           startDate,

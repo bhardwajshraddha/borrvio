@@ -31,7 +31,7 @@ const RenterDashboard = () => {
   const fetchDashboard = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/dashboard/renter",
+        "https://borrvio-backend.onrender.com/api/dashboard/renter",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -45,7 +45,7 @@ const RenterDashboard = () => {
   const fetchBookings = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/bookings/my",
+        "https://borrvio-backend.onrender.com/api/bookings/my",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -77,7 +77,7 @@ const RenterDashboard = () => {
   const handlePayment = async (booking) => {
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
+        "https://borrvio-backend.onrender.com/api/payment/create-order",
         { bookingId: booking._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -92,7 +92,7 @@ const RenterDashboard = () => {
         handler: async (response) => {
           try {
             await axios.post(
-              "http://localhost:5000/api/payment/verify",
+              "https://borrvio-backend.onrender.com/api/payment/verify",
               {
                 bookingId: booking._id,
                 razorpay_order_id: response.razorpay_order_id,

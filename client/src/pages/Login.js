@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -17,13 +17,16 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login', formData);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
-      toast.success('Welcome back to Borrvio!');
-      navigate('/browse');
+      const { data } = await axios.post(
+        "https://borrvio-backend.onrender.com/api/auth/login",
+        formData,
+      );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+      toast.success("Welcome back to Borrvio!");
+      navigate("/browse");
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed!');
+      toast.error(error.response?.data?.message || "Login failed!");
     } finally {
       setLoading(false);
     }
@@ -76,12 +79,12 @@ const Login = () => {
             disabled={loading}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <p className="text-gray-500 text-center mt-6">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link to="/register" className="text-orange-500 hover:underline">
             Register
           </Link>

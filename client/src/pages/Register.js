@@ -25,7 +25,7 @@ const Register = () => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://borrvio-backend.onrender.com/api/auth/register",
         formData,
       );
       localStorage.setItem("token", data.token);
