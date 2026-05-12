@@ -23,7 +23,7 @@ const RenterDashboard = () => {
   const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/dashboard/renter",
+        "https://borrvio.onrender.com/api/dashboard/renter",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -37,7 +37,7 @@ const RenterDashboard = () => {
   const fetchBookings = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/bookings/my",
+        "https://borrvio.onrender.com/api/bookings/my",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -80,7 +80,7 @@ const RenterDashboard = () => {
   const handlePayment = async (booking) => {
     try {
       const { data } = await axios.post(
-        "https://borrvio-backend.onrender.com/api/payment/create-order",
+        "https://borrvio.onrender.com/api/payment/create-order",
         { bookingId: booking._id },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -95,7 +95,7 @@ const RenterDashboard = () => {
         handler: async (response) => {
           try {
             await axios.post(
-              "https://borrvio-backend.onrender.com/api/payment/verify",
+              "https://borrvio.onrender.com/api/payment/verify",
               {
                 bookingId: booking._id,
                 razorpay_order_id: response.razorpay_order_id,

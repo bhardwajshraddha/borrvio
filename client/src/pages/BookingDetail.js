@@ -19,7 +19,7 @@ const BookingDetail = () => {
   const fetchBooking = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        `https://borrvio-backend.onrender.com/api/bookings/my`,
+        `https://borrvio.onrender.com/api/bookings/my`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -41,7 +41,7 @@ const BookingDetail = () => {
   const handleRating = async () => {
     try {
       await axios.post(
-        "https://borrvio-backend.onrender.com/api/ratings",
+        "https://borrvio.onrender.com/api/ratings",
         {
           bookingId: id,
           toUserId: booking.owner._id,
@@ -62,15 +62,12 @@ const BookingDetail = () => {
   const downloadAgreement = async () => {
     try {
       const { data } = await axios.get(
-        `https://borrvio-backend.onrender.com/api/agreements/${id}`,
+        `https://borrvio.onrender.com/api/agreements/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      window.open(
-        `https://borrvio-backend.onrender.com${data.pdfUrl}`,
-        "_blank",
-      );
+      window.open(`https://borrvio.onrender.com${data.pdfUrl}`, "_blank");
     } catch (error) {
       toast.error("Agreement not found!");
     }

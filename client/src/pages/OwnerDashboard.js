@@ -24,7 +24,7 @@ const OwnerDashboard = () => {
   const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/dashboard/owner",
+        "https://borrvio.onrender.com/api/dashboard/owner",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -38,7 +38,7 @@ const OwnerDashboard = () => {
   const fetchMyItems = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/items",
+        "https://borrvio.onrender.com/api/items",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -53,7 +53,7 @@ const OwnerDashboard = () => {
   const fetchBookings = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/bookings/owner",
+        "https://borrvio.onrender.com/api/bookings/owner",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -80,12 +80,9 @@ const OwnerDashboard = () => {
   const deleteItem = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
-      await axios.delete(
-        `https://borrvio-backend.onrender.com/api/items/${itemId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      await axios.delete(`https://borrvio.onrender.com/api/items/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Item deleted!");
       fetchMyItems();
       fetchDashboard();
@@ -97,7 +94,7 @@ const OwnerDashboard = () => {
   const toggleItem = async (itemId) => {
     try {
       const { data } = await axios.patch(
-        `https://borrvio-backend.onrender.com/api/items/${itemId}/toggle`,
+        `https://borrvio.onrender.com/api/items/${itemId}/toggle`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -111,7 +108,7 @@ const OwnerDashboard = () => {
   const updateStatus = async (bookingId, status) => {
     try {
       await axios.put(
-        `https://borrvio-backend.onrender.com/api/bookings/${bookingId}`,
+        `https://borrvio.onrender.com/api/bookings/${bookingId}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } },
       );

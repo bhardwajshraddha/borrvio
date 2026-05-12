@@ -46,7 +46,7 @@ const AddItem = () => {
     });
 
     const { data } = await axios.post(
-      "https://borrvio-backend.onrender.com/api/upload",
+      "https://borrvio.onrender.com/api/upload",
       formDataImg,
       {
         headers: {
@@ -75,7 +75,7 @@ const AddItem = () => {
       }
 
       await axios.post(
-        "https://borrvio-backend.onrender.com/api/items",
+        "https://borrvio.onrender.com/api/items",
         {
           ...formData,
           pricePerDay: Number(formData.pricePerDay),

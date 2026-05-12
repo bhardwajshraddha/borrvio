@@ -17,7 +17,7 @@ const Browse = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/items",
+        "https://borrvio.onrender.com/api/items",
         {
           params: { search, category, city },
         },

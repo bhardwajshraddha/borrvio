@@ -23,7 +23,7 @@ const Profile = () => {
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/auth/profile",
+        "https://borrvio.onrender.com/api/auth/profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -58,7 +58,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const { data } = await axios.put(
-        "https://borrvio-backend.onrender.com/api/auth/profile",
+        "https://borrvio.onrender.com/api/auth/profile",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

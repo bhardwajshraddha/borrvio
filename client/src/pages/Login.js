@@ -18,7 +18,7 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        "https://borrvio-backend.onrender.com/api/auth/login",
+        "https://borrvio.onrender.com/api/auth/login",
         formData,
       );
       localStorage.setItem("token", data.token);
