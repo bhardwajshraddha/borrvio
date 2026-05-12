@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config(); // ← SABSE PEHLE becouse of env file
 const express = require("express");
-const cors = require("cors");
+//const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const itemRoutes = require("./routes/itemRoutes");
@@ -15,16 +15,21 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const path = require("path");
 connectDB();
 const app = express();
+// CORS ki jagah yeh middleware added  - cors package ki zaroorat nahi
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://borrvio.vercel.app");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  );
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-app.use(
-  cors({
-    origin: ["https://borrvio.vercel.app", "http://localhost:3000"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
-app.options("*", cors());
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/items", itemRoutes);
