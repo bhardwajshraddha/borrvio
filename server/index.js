@@ -16,7 +16,7 @@ const path = require("path");
 connectDB();
 const app = express();
 // CORS ki jagah yeh middleware added  - cors package ki zaroorat nahi
-aapp.use((req, res, next) => {
+app.use((req, res, next) => {
   const allowedOrigins = [
     "https://borrvio.vercel.app",
     "http://localhost:3000",
