@@ -104,7 +104,7 @@ const AddItem = () => {
       <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold gradient-text cursor-pointer"
+          className="text-3xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
@@ -163,10 +163,11 @@ const AddItem = () => {
                 <option value="Vehicles">Vehicles</option>
                 <option value="Clothing">Clothing</option>
                 <option value="Sports">Sports</option>
+                <option value="Jewellery">Jewellery</option>
                 <option value="Other">Other</option>
               </select>
             </div>
-
+    
             {/* Description */}
             <div>
               <label className="text-gray-400 text-sm mb-2 block">
