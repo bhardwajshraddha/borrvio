@@ -16,8 +16,18 @@ const path = require("path");
 connectDB();
 const app = express();
 // CORS ki jagah yeh middleware added  - cors package ki zaroorat nahi
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://borrvio.vercel.app");
+aapp.use((req, res, next) => {
+  const allowedOrigins = [
+    "https://borrvio.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
@@ -25,9 +35,7 @@ app.use((req, res, next) => {
   );
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
   next();
 });
 app.use(express.json());

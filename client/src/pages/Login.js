@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FiMail, FiLock, FiArrowRight } from "react-icons/fi";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,59 +34,82 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center px-4">
+    <div className="gradient-bg min-h-screen flex items-center justify-center px-4">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-[#1a1a2e] p-8 rounded-2xl border border-gray-800 w-full max-w-md"
+        className="glass w-full max-w-md p-8 rounded-3xl border border-white/10 relative z-10"
       >
         {/* Logo */}
-        <h1 className="text-3xl font-extrabold text-orange-500 text-center mb-2">
-          Borrvio
-        </h1>
-        <p className="text-gray-400 text-center mb-8">Welcome back!</p>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-extrabold gradient-text mb-2">
+            Borrvio
+          </h1>
+          <p className="text-gray-400">Welcome back! 👋</p>
+        </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
+            <label className="text-gray-400 text-sm mb-2 block">Email</label>
+            <div className="relative">
+              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
+            <label className="text-gray-400 text-sm mb-2 block">Password</label>
+            <div className="relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
+            className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 flex items-center justify-center gap-2 glow-orange"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              "Logging in..."
+            ) : (
+              <>
+                {" "}
+                Login <FiArrowRight />{" "}
+              </>
+            )}
           </button>
         </form>
 
         <p className="text-gray-500 text-center mt-6">
           Don't have an account?{" "}
-          <Link to="/register" className="text-orange-500 hover:underline">
+          <Link
+            to="/register"
+            className="gradient-text font-semibold hover:opacity-80 transition"
+          >
             Register
           </Link>
         </p>

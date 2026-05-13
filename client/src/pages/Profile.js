@@ -3,7 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiUser, FiPhone, FiMapPin, FiStar, FiShield } from "react-icons/fi";
+import {
+  FiUser,
+  FiPhone,
+  FiMapPin,
+  FiStar,
+  FiShield,
+  FiLogOut,
+} from "react-icons/fi";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -19,7 +26,6 @@ const Profile = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ✅ FIX: Wrapped in useCallback so it can be safely added to useEffect deps
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await axios.get(
@@ -40,7 +46,6 @@ const Profile = () => {
     }
   }, [token]);
 
-  // ✅ FIX: Added all missing dependencies — fetchProfile, navigate, token
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -49,9 +54,8 @@ const Profile = () => {
     fetchProfile();
   }, [token, navigate, fetchProfile]);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,41 +78,47 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-white">
+    <div className="gradient-bg min-h-screen text-white">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
+      <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold text-orange-500 cursor-pointer"
+          className="text-2xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={() => navigate("/browse")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Browse
           </button>
           <button
             onClick={() => navigate("/owner-dashboard")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Dashboard
           </button>
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-2xl mx-auto px-6 py-10">
         {/* Profile Header */}
         {userInfo && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1a1a2e] rounded-2xl p-6 border border-gray-800 mb-6"
+            className="glass rounded-3xl p-6 border border-white/10 mb-6"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-2xl font-bold">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 btn-gradient rounded-full flex items-center justify-center text-2xl font-bold glow-orange">
                 {userInfo.name?.[0]}
               </div>
               <div>
@@ -117,29 +127,40 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-4">
-              <div className="bg-[#0f0f1a] rounded-xl p-3 text-center">
-                <FiShield className="text-orange-500 mx-auto mb-1" size={20} />
-                <p className="text-orange-500 font-bold">
-                  {userInfo.trustScore}%
-                </p>
-                <p className="text-gray-400 text-xs">Trust Score</p>
-              </div>
-              <div className="bg-[#0f0f1a] rounded-xl p-3 text-center">
-                <FiStar className="text-yellow-400 mx-auto mb-1" size={20} />
-                <p className="text-yellow-400 font-bold">
-                  {userInfo.averageRating || "New"}
-                </p>
-                <p className="text-gray-400 text-xs">Rating</p>
-              </div>
-              <div className="bg-[#0f0f1a] rounded-xl p-3 text-center">
-                <FiUser className="text-blue-400 mx-auto mb-1" size={20} />
-                <p className="text-blue-400 font-bold">
-                  {userInfo.totalRentalsAsRenter || 0}
-                </p>
-                <p className="text-gray-400 text-xs">Rentals</p>
-              </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                {
+                  icon: <FiShield size={20} />,
+                  value: `${userInfo.trustScore}%`,
+                  label: "Trust Score",
+                  color: "text-orange-400",
+                },
+                {
+                  icon: <FiStar size={20} />,
+                  value: userInfo.averageRating || "New",
+                  label: "Rating",
+                  color: "text-yellow-400",
+                },
+                {
+                  icon: <FiUser size={20} />,
+                  value: userInfo.totalRentalsAsRenter || 0,
+                  label: "Rentals",
+                  color: "text-blue-400",
+                },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="bg-white/5 rounded-2xl p-4 text-center border border-white/5"
+                >
+                  <div className={`${stat.color} flex justify-center mb-2`}>
+                    {stat.icon}
+                  </div>
+                  <p className={`${stat.color} font-bold text-lg`}>
+                    {stat.value}
+                  </p>
+                  <p className="text-gray-500 text-xs mt-1">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -149,27 +170,27 @@ const Profile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#1a1a2e] rounded-2xl p-6 border border-gray-800"
+          className="glass rounded-3xl p-6 border border-white/10"
         >
           <h3 className="text-xl font-bold mb-6">Edit Profile</h3>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
-                <FiUser className="inline mr-1" /> Full Name
+              <label className="text-gray-400 text-sm mb-2 block flex items-center gap-1">
+                <FiUser size={12} /> Full Name
               </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none input-glow transition-all"
               />
             </div>
 
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
-                <FiPhone className="inline mr-1" /> Phone Number
+              <label className="text-gray-400 text-sm mb-2 block flex items-center gap-1">
+                <FiPhone size={12} /> Phone Number
               </label>
               <input
                 type="tel"
@@ -177,31 +198,31 @@ const Profile = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter your phone number"
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
             </div>
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">
-                  <FiMapPin className="inline mr-1" /> City
+                <label className="text-gray-400 text-sm mb-2 block flex items-center gap-1">
+                  <FiMapPin size={12} /> City
                 </label>
                 <input
                   type="text"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none input-glow transition-all"
                 />
               </div>
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">Area</label>
+                <label className="text-gray-400 text-sm mb-2 block">Area</label>
                 <input
                   type="text"
                   name="area"
                   value={formData.area}
                   onChange={handleChange}
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none input-glow transition-all"
                 />
               </div>
             </div>
@@ -209,7 +230,7 @@ const Profile = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
+              className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 glow-orange"
             >
               {loading ? "Updating..." : "Update Profile"}
             </button>
@@ -224,9 +245,9 @@ const Profile = () => {
             navigate("/login");
             toast.success("Logged out!");
           }}
-          className="w-full mt-4 py-3 border border-red-500 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition font-semibold"
+          className="w-full mt-4 py-3 glass border border-red-500/30 text-red-400 rounded-2xl hover:bg-red-500/10 transition font-semibold flex items-center justify-center gap-2"
         >
-          Logout
+          <FiLogOut /> Logout
         </button>
       </div>
     </div>

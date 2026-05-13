@@ -3,6 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiPhone,
+  FiMapPin,
+  FiArrowRight,
+} from "react-icons/fi";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,87 +48,113 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center px-4">
+    <div className="gradient-bg min-h-screen flex items-center justify-center px-4 py-10">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-[#1a1a2e] p-8 rounded-2xl border border-gray-800 w-full max-w-md"
+        className="glass w-full max-w-md p-8 rounded-3xl border border-white/10 relative z-10"
       >
-        <h1 className="text-3xl font-extrabold text-orange-500 text-center mb-2">
-          Borrvio
-        </h1>
-        <p className="text-gray-400 text-center mb-8">Create your account!</p>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-extrabold gradient-text mb-2">
+            Borrvio
+          </h1>
+          <p className="text-gray-400">Create your account! 🚀</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">
+            <label className="text-gray-400 text-sm mb-2 block">
               Full Name
             </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              required
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-400 text-sm mb-1 block">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-400 text-sm mb-1 block">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              required
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
-          </div>
-          <div>
-            <label className="text-gray-400 text-sm mb-1 block">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Enter your phone number"
-              className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
-            />
-          </div>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-gray-400 text-sm mb-1 block">City</label>
+            <div className="relative">
+              <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
               <input
                 type="text"
-                name="city"
-                value={formData.city}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="City"
+                placeholder="Enter your full name"
                 required
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Email</label>
+            <div className="relative">
+              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Password</label>
+            <div className="relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">
+              Phone Number
+            </label>
+            <div className="relative">
+              <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Enter your phone number"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
             <div className="flex-1">
-              <label className="text-gray-400 text-sm mb-1 block">Area</label>
+              <label className="text-gray-400 text-sm mb-2 block">City</label>
+              <div className="relative">
+                <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="City"
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+                />
+              </div>
+            </div>
+            <div className="flex-1">
+              <label className="text-gray-400 text-sm mb-2 block">Area</label>
+
               <input
                 type="text"
                 name="area"
@@ -128,7 +162,7 @@ const Register = () => {
                 onChange={handleChange}
                 placeholder="Area"
                 required
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
             </div>
           </div>
@@ -136,15 +170,25 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
+            className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 flex items-center justify-center gap-2 glow-orange"
           >
-            {loading ? "Creating Account..." : "Register"}
+            {loading ? (
+              "Creating Account..."
+            ) : (
+              <>
+                {" "}
+                Register <FiArrowRight />{" "}
+              </>
+            )}
           </button>
         </form>
 
         <p className="text-gray-500 text-center mt-6">
           Already have an account?{" "}
-          <Link to="/login" className="text-orange-500 hover:underline">
+          <Link
+            to="/login"
+            className="gradient-text font-semibold hover:opacity-80 transition"
+          >
             Login
           </Link>
         </p>

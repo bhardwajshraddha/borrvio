@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiUpload, FiX } from "react-icons/fi";
+import { FiUpload, FiX, FiArrowLeft } from "react-icons/fi";
 
 const AddItem = () => {
   const navigate = useNavigate();
@@ -15,13 +15,16 @@ const AddItem = () => {
     securityDeposit: "",
     city: "",
     area: "",
+    address: "",
   });
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("token");
-
+  useEffect(() => {
+    return () => previews.forEach((url) => URL.revokeObjectURL(url));
+  }, [previews]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -34,17 +37,13 @@ const AddItem = () => {
   };
 
   const removeImage = (index) => {
-    const newImages = images.filter((_, i) => i !== index);
-    const newPreviews = previews.filter((_, i) => i !== index);
-    setImages(newImages);
-    setPreviews(newPreviews);
+    setImages(images.filter((_, i) => i !== index));
+    setPreviews(previews.filter((_, i) => i !== index));
   };
+
   const uploadImages = async () => {
     const formDataImg = new FormData();
-    images.forEach((image) => {
-      formDataImg.append("image", image);
-    });
-
+    images.forEach((image) => formDataImg.append("image", image));
     const { data } = await axios.post(
       "https://borrvio.onrender.com/api/upload",
       formDataImg,
@@ -73,7 +72,6 @@ const AddItem = () => {
         imageUrls = await uploadImages();
         toast.dismiss();
       }
-
       await axios.post(
         "https://borrvio.onrender.com/api/items",
         {
@@ -82,11 +80,8 @@ const AddItem = () => {
           securityDeposit: Number(formData.securityDeposit),
           images: imageUrls,
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
-
       toast.success("Item listed successfully!");
       navigate("/browse");
     } catch (error) {
@@ -98,32 +93,37 @@ const AddItem = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-white">
+    <div className="gradient-bg min-h-screen text-white">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
+      <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold text-orange-500 cursor-pointer"
+          className="text-2xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
         <button
           onClick={() => navigate("/browse")}
-          className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+          className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
         >
-          Back to Browse
+          <FiArrowLeft /> Back to Browse
         </button>
       </nav>
 
-      {/* Form */}
-      <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-2xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-[#1a1a2e] p-8 rounded-2xl border border-gray-800"
+          className="glass p-8 rounded-3xl border border-white/10"
         >
-          <h2 className="text-2xl font-bold mb-2">List Your Item</h2>
+          <h2 className="text-3xl font-bold mb-2">List Your Item</h2>
           <p className="text-gray-400 mb-8">
             Fill in the details to list your item for rent
           </p>
@@ -131,7 +131,7 @@ const AddItem = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Name */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Item Name
               </label>
               <input
@@ -141,13 +141,13 @@ const AddItem = () => {
                 onChange={handleChange}
                 placeholder="e.g. Canon DSLR Camera"
                 required
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
             </div>
 
             {/* Category */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Category
               </label>
               <select
@@ -155,7 +155,8 @@ const AddItem = () => {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-[#0d0d2b] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none input-glow transition-all"
+                style={{ colorScheme: "dark" }}
               >
                 <option value="">Select Category</option>
                 <option value="Electronics">Electronics</option>
@@ -168,7 +169,7 @@ const AddItem = () => {
 
             {/* Description */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Description
               </label>
               <textarea
@@ -178,14 +179,14 @@ const AddItem = () => {
                 placeholder="Describe your item..."
                 required
                 rows={4}
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition resize-none"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all resize-none"
               />
             </div>
 
             {/* Price + Deposit */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">
+                <label className="text-gray-400 text-sm mb-2 block">
                   Price Per Day (₹)
                 </label>
                 <input
@@ -195,11 +196,11 @@ const AddItem = () => {
                   onChange={handleChange}
                   placeholder="e.g. 500"
                   required
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
                 />
               </div>
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">
+                <label className="text-gray-400 text-sm mb-2 block">
                   Security Deposit (₹)
                 </label>
                 <input
@@ -209,7 +210,7 @@ const AddItem = () => {
                   onChange={handleChange}
                   placeholder="e.g. 5000"
                   required
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
                 />
               </div>
             </div>
@@ -217,7 +218,7 @@ const AddItem = () => {
             {/* City + Area */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">City</label>
+                <label className="text-gray-400 text-sm mb-2 block">City</label>
                 <input
                   type="text"
                   name="city"
@@ -225,11 +226,11 @@ const AddItem = () => {
                   onChange={handleChange}
                   placeholder="e.g. Pune"
                   required
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
                 />
               </div>
               <div className="flex-1">
-                <label className="text-gray-400 text-sm mb-1 block">Area</label>
+                <label className="text-gray-400 text-sm mb-2 block">Area</label>
                 <input
                   type="text"
                   name="area"
@@ -237,12 +238,14 @@ const AddItem = () => {
                   onChange={handleChange}
                   placeholder="e.g. Kothrud"
                   required
-                  className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
                 />
               </div>
             </div>
+
+            {/* Pickup Address */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Pickup Address
               </label>
               <input
@@ -251,18 +254,22 @@ const AddItem = () => {
                 value={formData.address}
                 onChange={handleChange}
                 placeholder="e.g. Shop 5, FC Road, Near XYZ Mall"
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
             </div>
+
             {/* Image Upload */}
             <div>
-              <label className="text-gray-400 text-sm mb-1 block">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Upload Images
               </label>
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-700 rounded-xl cursor-pointer hover:border-orange-500 transition">
-                <FiUpload className="text-gray-400 text-2xl mb-2" />
+              <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-white/20 rounded-2xl cursor-pointer hover:border-orange-500/50 transition-all bg-white/5">
+                <FiUpload className="text-gray-400 text-3xl mb-2" />
                 <span className="text-gray-400 text-sm">
                   Click to upload images
+                </span>
+                <span className="text-gray-600 text-xs mt-1">
+                  PNG, JPG up to 10MB
                 </span>
                 <input
                   type="file"
@@ -273,7 +280,6 @@ const AddItem = () => {
                 />
               </label>
 
-              {/* Image Previews */}
               {previews.length > 0 && (
                 <div className="flex gap-3 mt-4 flex-wrap">
                   {previews.map((preview, i) => (
@@ -281,12 +287,12 @@ const AddItem = () => {
                       <img
                         src={preview}
                         alt="preview"
-                        className="w-20 h-20 object-cover rounded-xl"
+                        className="w-20 h-20 object-cover rounded-xl border border-white/10"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(i)}
-                        className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1"
+                        className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600 transition"
                       >
                         <FiX size={10} />
                       </button>
@@ -299,9 +305,9 @@ const AddItem = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition mt-2"
+              className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 glow-orange"
             >
-              {loading ? "Listing Item..." : "List Item"}
+              {loading ? "Listing Item..." : "🚀 List Item"}
             </button>
           </form>
         </motion.div>
