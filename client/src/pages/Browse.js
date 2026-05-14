@@ -16,10 +16,13 @@ const Browse = () => {
   const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("borrvio.onrender.com/api/items", {
-        params: { search, category, city },
-      });
-      setItems(data);
+      const { data } = await axios.get(
+        "https://borrvio.onrender.com/api/items",
+        {
+          params: { search, category, city },
+        },
+      );
+      setItems(Array.isArray(data) ? data : data.items || []);
     } catch (error) {
       console.error(error);
     } finally {
