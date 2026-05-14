@@ -8,6 +8,8 @@ import {
   FiDollarSign,
   FiClock,
   FiCheckCircle,
+  FiPlus,
+  FiUser,
 } from "react-icons/fi";
 
 const OwnerDashboard = () => {
@@ -20,7 +22,6 @@ const OwnerDashboard = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ✅ FIX: Wrapped all fetch functions in useCallback with proper deps
   const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
@@ -43,8 +44,7 @@ const OwnerDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      const ownerItems = data.filter((item) => item.owner._id === user._id);
-      setMyItems(ownerItems);
+      setMyItems(data.filter((item) => item.owner._id === user._id));
     } catch (error) {
       console.error(error);
     }
@@ -66,7 +66,6 @@ const OwnerDashboard = () => {
     }
   }, [token]);
 
-  // ✅ FIX: Added all missing dependencies
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -138,52 +137,61 @@ const OwnerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-white">
+    <div className="gradient-bg min-h-screen text-white">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
+      <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold text-orange-500 cursor-pointer"
+          className="text-2xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={() => navigate("/browse")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Browse
           </button>
           <button
             onClick={() => navigate("/add-item")}
-            className="px-4 py-2 bg-orange-500 rounded-lg hover:bg-orange-600 transition font-semibold"
+            className="flex items-center gap-2 px-4 py-2 btn-gradient rounded-xl font-semibold glow-orange"
           >
-            + List Item
+            <FiPlus /> List Item
           </button>
           <button
             onClick={() => navigate("/renter-dashboard")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Renter View
           </button>
           <button
             onClick={() => navigate("/profile")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
-            Profile
+            <FiUser /> Profile
           </button>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
         {/* Welcome */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h2 className="text-3xl font-bold">Owner Dashboard</h2>
-          <p className="text-gray-400 mt-1">Welcome back, {user.name}!</p>
+          <h2 className="text-4xl font-bold">Owner Dashboard</h2>
+          <p className="text-gray-400 mt-2">
+            Welcome back,{" "}
+            <span className="gradient-text font-semibold">{user.name}</span>!
+          </p>
         </motion.div>
 
         {/* Stats */}
@@ -191,28 +199,32 @@ const OwnerDashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               {
-                icon: <FiDollarSign />,
+                icon: <FiDollarSign size={24} />,
                 label: "Total Earnings",
                 value: `₹${dashboard.totalEarnings}`,
                 color: "text-green-400",
+                bg: "bg-green-400/10",
               },
               {
-                icon: <FiPackage />,
+                icon: <FiPackage size={24} />,
                 label: "Total Items",
                 value: dashboard.totalItems,
                 color: "text-blue-400",
+                bg: "bg-blue-400/10",
               },
               {
-                icon: <FiClock />,
-                label: "Pending Requests",
+                icon: <FiClock size={24} />,
+                label: "Pending",
                 value: dashboard.pendingRequests,
                 color: "text-yellow-400",
+                bg: "bg-yellow-400/10",
               },
               {
-                icon: <FiCheckCircle />,
+                icon: <FiCheckCircle size={24} />,
                 label: "Completed",
                 value: dashboard.completedRentals,
                 color: "text-orange-400",
+                bg: "bg-orange-400/10",
               },
             ].map((stat, i) => (
               <motion.div
@@ -220,9 +232,13 @@ const OwnerDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#1a1a2e] rounded-2xl p-5 border border-gray-800"
+                className="glass rounded-3xl p-5 border border-white/10"
               >
-                <div className={`text-2xl mb-2 ${stat.color}`}>{stat.icon}</div>
+                <div
+                  className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-3`}
+                >
+                  {stat.icon}
+                </div>
                 <p className="text-gray-400 text-sm">{stat.label}</p>
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>
                   {stat.value}
@@ -233,28 +249,31 @@ const OwnerDashboard = () => {
         )}
 
         {/* Bookings */}
-        <h3 className="text-xl font-bold mb-4">Booking Requests</h3>
+        <h3 className="text-2xl font-bold mb-6">Booking Requests</h3>
         {loading ? (
-          <p className="text-gray-400">Loading...</p>
+          <div className="flex justify-center py-10">
+            <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
         ) : bookings.length === 0 ? (
-          <div className="bg-[#1a1a2e] rounded-2xl p-10 border border-gray-800 text-center">
-            <p className="text-gray-400">No bookings yet!</p>
+          <div className="glass rounded-3xl p-10 border border-white/10 text-center mb-10">
+            <p className="text-5xl mb-4">📭</p>
+            <p className="text-gray-400 mb-4">No bookings yet!</p>
             <button
               onClick={() => navigate("/add-item")}
-              className="mt-4 px-6 py-2 bg-orange-500 rounded-xl hover:bg-orange-600 transition"
+              className="px-6 py-2 btn-gradient rounded-xl glow-orange"
             >
               List Your First Item
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mb-10">
             {bookings.map((booking, i) => (
               <motion.div
                 key={booking._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-[#1a1a2e] rounded-2xl p-5 border border-gray-800"
+                transition={{ delay: i * 0.05 }}
+                className="glass rounded-3xl p-5 border border-white/10 card-hover"
               >
                 <div className="flex justify-between items-start flex-wrap gap-4">
                   <div>
@@ -266,15 +285,14 @@ const OwnerDashboard = () => {
                       <span className="text-white">{booking.renter?.name}</span>
                     </p>
                     <p className="text-gray-400 text-sm">
-                      Dates: {new Date(booking.startDate).toDateString()} →{" "}
+                      {new Date(booking.startDate).toDateString()} →{" "}
                       {new Date(booking.endDate).toDateString()}
                     </p>
-                    <p className="text-gray-400 text-sm">
-                      Total:{" "}
-                      <span className="text-orange-500 font-semibold">
+                    <p className="text-gray-400 text-sm mt-1">
+                      <span className="gradient-text font-semibold">
                         ₹{booking.totalAmount}
                       </span>
-                      <span className="ml-2">
+                      <span className="ml-2 text-gray-500">
                         + ₹{booking.depositAmount} deposit
                       </span>
                     </p>
@@ -286,37 +304,34 @@ const OwnerDashboard = () => {
                     >
                       {booking.status}
                     </span>
-
                     {booking.status === "Requested" && (
                       <div className="flex gap-2">
                         <button
                           onClick={() => updateStatus(booking._id, "Accepted")}
-                          className="px-4 py-1 bg-green-500 hover:bg-green-600 rounded-lg text-sm transition"
+                          className="px-4 py-1 bg-green-500 hover:bg-green-600 rounded-xl text-sm transition"
                         >
                           Accept
                         </button>
                         <button
                           onClick={() => updateStatus(booking._id, "Cancelled")}
-                          className="px-4 py-1 bg-red-500 hover:bg-red-600 rounded-lg text-sm transition"
+                          className="px-4 py-1 bg-red-500 hover:bg-red-600 rounded-xl text-sm transition"
                         >
                           Decline
                         </button>
                       </div>
                     )}
-
                     {booking.status === "Accepted" && (
                       <button
                         onClick={() => updateStatus(booking._id, "Active")}
-                        className="px-4 py-1 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm transition"
+                        className="px-4 py-1 bg-blue-500 hover:bg-blue-600 rounded-xl text-sm transition"
                       >
                         Mark Active
                       </button>
                     )}
-
                     {booking.status === "Active" && (
                       <button
                         onClick={() => updateStatus(booking._id, "Completed")}
-                        className="px-4 py-1 bg-gray-500 hover:bg-gray-600 rounded-lg text-sm transition"
+                        className="px-4 py-1 bg-gray-500 hover:bg-gray-600 rounded-xl text-sm transition"
                       >
                         Mark Completed
                       </button>
@@ -329,13 +344,14 @@ const OwnerDashboard = () => {
         )}
 
         {/* My Items */}
-        <h3 className="text-xl font-bold mb-4 mt-10">My Listed Items</h3>
+        <h3 className="text-2xl font-bold mb-6">My Listed Items</h3>
         {myItems.length === 0 ? (
-          <div className="bg-[#1a1a2e] rounded-2xl p-10 border border-gray-800 text-center">
-            <p className="text-gray-400">No items listed yet!</p>
+          <div className="glass rounded-3xl p-10 border border-white/10 text-center">
+            <p className="text-5xl mb-4">📦</p>
+            <p className="text-gray-400 mb-4">No items listed yet!</p>
             <button
               onClick={() => navigate("/add-item")}
-              className="mt-4 px-6 py-2 bg-orange-500 rounded-xl hover:bg-orange-600 transition"
+              className="px-6 py-2 btn-gradient rounded-xl glow-orange"
             >
               List Your First Item
             </button>
@@ -348,11 +364,10 @@ const OwnerDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#1a1a2e] rounded-2xl border border-gray-800 overflow-hidden"
+                className="glass rounded-3xl border border-white/10 overflow-hidden card-hover"
               >
-                {/* Image */}
-                <div className="h-40 bg-[#0f0f1a] flex items-center justify-center">
-                  {item.images && item.images.length > 0 ? (
+                <div className="h-40 bg-white/5 flex items-center justify-center">
+                  {item.images?.length > 0 ? (
                     <img
                       src={item.images[0]}
                       alt={item.name}
@@ -362,36 +377,28 @@ const OwnerDashboard = () => {
                     <span className="text-4xl">📦</span>
                   )}
                 </div>
-
-                {/* Info */}
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold">{item.name}</h4>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${item.isAvailable ? "bg-green-500" : "bg-red-500"}`}
+                      className={`text-xs px-2 py-1 rounded-full ${item.isAvailable ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
                     >
                       {item.isAvailable ? "Active" : "Inactive"}
                     </span>
                   </div>
-                  <p className="text-orange-500 font-bold mb-3">
+                  <p className="gradient-text font-bold mb-3">
                     ₹{item.pricePerDay}/day
                   </p>
-
-                  {/* Buttons */}
                   <div className="flex gap-2">
                     <button
                       onClick={() => toggleItem(item._id)}
-                      className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${
-                        item.isAvailable
-                          ? "bg-yellow-500 hover:bg-yellow-600"
-                          : "bg-green-500 hover:bg-green-600"
-                      }`}
+                      className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${item.isAvailable ? "bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30" : "bg-green-500/20 text-green-400 hover:bg-green-500/30"}`}
                     >
                       {item.isAvailable ? "⏸ Deactivate" : "▶ Activate"}
                     </button>
                     <button
                       onClick={() => deleteItem(item._id)}
-                      className="flex-1 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-sm font-semibold transition"
+                      className="flex-1 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-xl text-sm font-semibold transition"
                     >
                       🗑 Delete
                     </button>

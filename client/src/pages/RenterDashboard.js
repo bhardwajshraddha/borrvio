@@ -8,6 +8,7 @@ import {
   FiClock,
   FiCheckCircle,
   FiDollarSign,
+  FiUser,
 } from "react-icons/fi";
 
 const RenterDashboard = () => {
@@ -19,7 +20,6 @@ const RenterDashboard = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ✅ FIX: Wrapped in useCallback with proper deps
   const fetchDashboard = useCallback(async () => {
     try {
       const { data } = await axios.get(
@@ -50,7 +50,6 @@ const RenterDashboard = () => {
     }
   }, [token]);
 
-  // ✅ FIX: Added all missing dependencies — fetchBookings, fetchDashboard, navigate, token
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -110,10 +109,7 @@ const RenterDashboard = () => {
             toast.error("Payment verification failed!");
           }
         },
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
+        prefill: { name: user.name, email: user.email },
         theme: { color: "#f97316" },
       };
 
@@ -125,45 +121,54 @@ const RenterDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-white">
+    <div className="gradient-bg min-h-screen text-white">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
+      <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold text-orange-500 cursor-pointer"
+          className="text-2xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={() => navigate("/browse")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Browse
           </button>
           <button
             onClick={() => navigate("/owner-dashboard")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Owner View
           </button>
           <button
             onClick={() => navigate("/profile")}
-            className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+            className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
-            Profile
+            <FiUser /> Profile
           </button>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h2 className="text-3xl font-bold">Renter Dashboard</h2>
-          <p className="text-gray-400 mt-1">Welcome, {user.name}!</p>
+          <h2 className="text-4xl font-bold">Renter Dashboard</h2>
+          <p className="text-gray-400 mt-2">
+            Welcome,{" "}
+            <span className="gradient-text font-semibold">{user.name}</span>!
+          </p>
         </motion.div>
 
         {/* Stats */}
@@ -171,28 +176,32 @@ const RenterDashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               {
-                icon: <FiClock />,
+                icon: <FiClock size={24} />,
                 label: "Pending",
                 value: dashboard.pendingBookings,
                 color: "text-yellow-400",
+                bg: "bg-yellow-400/10",
               },
               {
-                icon: <FiShoppingBag />,
+                icon: <FiShoppingBag size={24} />,
                 label: "Active",
                 value: dashboard.activeBookings,
                 color: "text-green-400",
+                bg: "bg-green-400/10",
               },
               {
-                icon: <FiCheckCircle />,
+                icon: <FiCheckCircle size={24} />,
                 label: "Completed",
                 value: dashboard.completedBookings,
                 color: "text-blue-400",
+                bg: "bg-blue-400/10",
               },
               {
-                icon: <FiDollarSign />,
+                icon: <FiDollarSign size={24} />,
                 label: "Total Spent",
                 value: `₹${dashboard.totalSpent}`,
                 color: "text-orange-400",
+                bg: "bg-orange-400/10",
               },
             ].map((stat, i) => (
               <motion.div
@@ -200,9 +209,13 @@ const RenterDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#1a1a2e] rounded-2xl p-5 border border-gray-800"
+                className="glass rounded-3xl p-5 border border-white/10"
               >
-                <div className={`text-2xl mb-2 ${stat.color}`}>{stat.icon}</div>
+                <div
+                  className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-3`}
+                >
+                  {stat.icon}
+                </div>
                 <p className="text-gray-400 text-sm">{stat.label}</p>
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>
                   {stat.value}
@@ -213,15 +226,18 @@ const RenterDashboard = () => {
         )}
 
         {/* Bookings */}
-        <h3 className="text-xl font-bold mb-4">My Bookings</h3>
+        <h3 className="text-2xl font-bold mb-6">My Bookings</h3>
         {loading ? (
-          <p className="text-gray-400">Loading...</p>
+          <div className="flex justify-center py-10">
+            <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
         ) : bookings.length === 0 ? (
-          <div className="bg-[#1a1a2e] rounded-2xl p-10 border border-gray-800 text-center">
-            <p className="text-gray-400">No bookings yet!</p>
+          <div className="glass rounded-3xl p-10 border border-white/10 text-center">
+            <p className="text-5xl mb-4">🛒</p>
+            <p className="text-gray-400 mb-4">No bookings yet!</p>
             <button
               onClick={() => navigate("/browse")}
-              className="mt-4 px-6 py-2 bg-orange-500 rounded-xl hover:bg-orange-600 transition"
+              className="px-6 py-2 btn-gradient rounded-xl glow-orange"
             >
               Browse Items
             </button>
@@ -233,11 +249,11 @@ const RenterDashboard = () => {
                 key={booking._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-[#1a1a2e] rounded-2xl p-5 border border-gray-800"
+                transition={{ delay: i * 0.05 }}
+                className="glass rounded-3xl p-5 border border-white/10 card-hover"
               >
                 <div className="flex justify-between items-start flex-wrap gap-4">
-                  <div>
+                  <div className="flex-1">
                     <h4 className="font-semibold text-lg">
                       {booking.item?.name}
                     </h4>
@@ -246,23 +262,24 @@ const RenterDashboard = () => {
                       <span className="text-white">{booking.owner?.name}</span>
                     </p>
                     <p className="text-gray-400 text-sm">
-                      Dates: {new Date(booking.startDate).toDateString()} →{" "}
+                      {new Date(booking.startDate).toDateString()} →{" "}
                       {new Date(booking.endDate).toDateString()}
                     </p>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-sm mt-1">
                       Total:{" "}
-                      <span className="text-orange-500 font-semibold">
+                      <span className="gradient-text font-semibold">
                         ₹{booking.totalAmount}
                       </span>
+                      <span className="text-gray-500 ml-2">
+                        Deposit: ₹{booking.depositAmount}
+                      </span>
                     </p>
-                    <p className="text-gray-400 text-sm">
-                      Deposit: ₹{booking.depositAmount}
-                    </p>
+
                     {booking.status === "Accepted" &&
                       booking.paymentStatus !== "Paid" && (
                         <button
                           onClick={() => handlePayment(booking)}
-                          className="mt-3 w-full bg-green-500 hover:bg-green-600 py-2 rounded-xl text-sm font-semibold transition"
+                          className="mt-3 w-full bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 py-2 rounded-xl text-sm font-semibold transition"
                         >
                           💳 Pay Now — ₹
                           {booking.totalAmount + booking.depositAmount}
@@ -270,11 +287,12 @@ const RenterDashboard = () => {
                       )}
 
                     {booking.paymentStatus === "Paid" && (
-                      <p className="mt-3 text-center text-green-400 font-semibold">
+                      <p className="mt-3 text-center text-green-400 font-semibold text-sm">
                         ✅ Payment Done
                       </p>
                     )}
                   </div>
+
                   <span
                     className={`${statusColor(booking.status)} px-3 py-1 rounded-full text-sm font-semibold h-fit`}
                   >
