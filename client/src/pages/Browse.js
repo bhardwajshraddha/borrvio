@@ -16,12 +16,9 @@ const Browse = () => {
   const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        "https://borrvio-backend.onrender.com/api/items",
-        {
-          params: { search, category, city },
-        },
-      );
+      const { data } = await axios.get("borrvio.onrender.com/api/items", {
+        params: { search, category, city },
+      });
       setItems(data);
     } catch (error) {
       console.error(error);
