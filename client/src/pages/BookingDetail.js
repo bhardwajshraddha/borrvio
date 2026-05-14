@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiDownload, FiStar } from "react-icons/fi";
+import { FiDownload, FiStar, FiArrowLeft } from "react-icons/fi";
 
 const BookingDetail = () => {
   const { id } = useParams();
@@ -13,13 +13,11 @@ const BookingDetail = () => {
   const [rating, setRating] = useState({ stars: 5, comment: "" });
 
   const token = localStorage.getItem("token");
-  // ✅ FIX 1: Removed unused 'user' variable (was: const user = JSON.parse(...))
 
-  // ✅ FIX 2: Wrapped in useCallback so it can be safely added to useEffect deps
   const fetchBooking = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        `https://borrvio.onrender.com/api/bookings/my`,
+        "https://borrvio.onrender.com/api/bookings/my",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -33,7 +31,6 @@ const BookingDetail = () => {
     }
   }, [token, id]);
 
-  // ✅ FIX 2: Added 'token' (via fetchBooking) to dependency array
   useEffect(() => {
     fetchBooking();
   }, [fetchBooking]);
@@ -49,9 +46,7 @@ const BookingDetail = () => {
           comment: rating.comment,
           ratingType: "Renter-to-Owner",
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       toast.success("Rating submitted!");
     } catch (error) {
@@ -75,95 +70,91 @@ const BookingDetail = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center">
-        <p className="text-gray-400">Loading...</p>
+      <div className="gradient-bg min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
 
   if (!booking)
     return (
-      <div className="min-h-screen bg-[#0f0f1a] flex items-center justify-center">
+      <div className="gradient-bg min-h-screen flex items-center justify-center">
         <p className="text-gray-400">Booking not found!</p>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-white">
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
+    <div className="gradient-bg min-h-screen text-white">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
+      </div>
+
+      {/* Navbar */}
+      <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
-          className="text-2xl font-bold text-orange-500 cursor-pointer"
+          className="text-2xl font-bold gradient-text cursor-pointer"
         >
           Borrvio
         </h1>
         <button
           onClick={() => navigate("/renter-dashboard")}
-          className="px-4 py-2 border border-gray-700 rounded-lg hover:border-orange-500 transition"
+          className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
         >
-          Back
+          <FiArrowLeft /> Back
         </button>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-2xl mx-auto px-6 py-10">
+        {/* Booking Details */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a1a2e] rounded-2xl p-6 border border-gray-800 mb-6"
+          className="glass rounded-3xl p-6 border border-white/10 mb-6"
         >
-          <h2 className="text-2xl font-bold mb-4">Booking Details</h2>
-          <div className="flex flex-col gap-3 text-gray-400">
-            <div className="flex justify-between">
-              <span>Item</span>
-              <span className="text-white font-semibold">
-                {booking.item?.name}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Owner</span>
-              <span className="text-white">{booking.owner?.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Start Date</span>
-              <span className="text-white">
-                {new Date(booking.startDate).toDateString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>End Date</span>
-              <span className="text-white">
-                {new Date(booking.endDate).toDateString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Days</span>
-              <span className="text-white">{booking.totalDays}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Amount</span>
-              <span className="text-orange-500 font-bold">
-                ₹{booking.totalAmount}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Deposit</span>
-              <span className="text-white">₹{booking.depositAmount}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Status</span>
-              <span className="text-orange-500 font-semibold">
-                {booking.status}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Deposit Status</span>
-              <span className="text-white">{booking.depositStatus}</span>
-            </div>
+          <h2 className="text-2xl font-bold mb-6">Booking Details</h2>
+
+          <div className="flex flex-col gap-4">
+            {[
+              { label: "Item", value: booking.item?.name, highlight: true },
+              { label: "Owner", value: booking.owner?.name },
+              {
+                label: "Start Date",
+                value: new Date(booking.startDate).toDateString(),
+              },
+              {
+                label: "End Date",
+                value: new Date(booking.endDate).toDateString(),
+              },
+              { label: "Total Days", value: booking.totalDays },
+              {
+                label: "Total Amount",
+                value: `₹${booking.totalAmount}`,
+                gradient: true,
+              },
+              { label: "Deposit", value: `₹${booking.depositAmount}` },
+              { label: "Status", value: booking.status, orange: true },
+              { label: "Deposit Status", value: booking.depositStatus },
+            ].map((row, i) => (
+              <div
+                key={i}
+                className="flex justify-between items-center py-2 border-b border-white/5 last:border-0"
+              >
+                <span className="text-gray-400">{row.label}</span>
+                <span
+                  className={`font-semibold ${row.gradient ? "gradient-text text-lg" : row.orange ? "text-orange-400" : "text-white"}`}
+                >
+                  {row.value}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* Download Agreement */}
           <button
             onClick={downloadAgreement}
-            className="w-full mt-6 flex items-center justify-center gap-2 bg-[#0f0f1a] border border-gray-700 hover:border-orange-500 py-3 rounded-xl transition"
+            className="w-full mt-6 flex items-center justify-center gap-2 glass border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 py-3 rounded-xl transition font-semibold"
           >
             <FiDownload /> Download Rental Agreement
           </button>
@@ -174,20 +165,20 @@ const BookingDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1a1a2e] rounded-2xl p-6 border border-gray-800"
+            className="glass rounded-3xl p-6 border border-white/10"
           >
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <h3 className="text-xl font-bold mb-5 flex items-center gap-2">
               <FiStar className="text-yellow-400" /> Rate Your Experience
             </h3>
 
-            <div className="mb-4">
-              <label className="text-gray-400 text-sm mb-2 block">Stars</label>
-              <div className="flex gap-2">
+            <div className="mb-5">
+              <label className="text-gray-400 text-sm mb-3 block">Stars</label>
+              <div className="flex gap-3">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     onClick={() => setRating({ ...rating, stars: star })}
-                    className={`text-2xl ${star <= rating.stars ? "text-yellow-400" : "text-gray-600"}`}
+                    className={`text-3xl transition-all ${star <= rating.stars ? "text-yellow-400 scale-110" : "text-gray-600"}`}
                   >
                     ★
                   </button>
@@ -195,8 +186,8 @@ const BookingDetail = () => {
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="text-gray-400 text-sm mb-1 block">
+            <div className="mb-5">
+              <label className="text-gray-400 text-sm mb-2 block">
                 Comment
               </label>
               <textarea
@@ -206,13 +197,13 @@ const BookingDetail = () => {
                 }
                 placeholder="Share your experience..."
                 rows={3}
-                className="w-full bg-[#0f0f1a] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 resize-none"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow resize-none"
               />
             </div>
 
             <button
               onClick={handleRating}
-              className="w-full bg-orange-500 hover:bg-orange-600 py-3 rounded-xl font-semibold transition"
+              className="w-full btn-gradient py-3 rounded-xl font-semibold glow-orange"
             >
               Submit Rating
             </button>
