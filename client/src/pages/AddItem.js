@@ -163,11 +163,13 @@ const AddItem = () => {
                 <option value="Vehicles">Vehicles</option>
                 <option value="Clothing">Clothing</option>
                 <option value="Sports">Sports</option>
+                <option value="Tools">Tools</option>
+                <option value="Furniture">Furniture</option>
                 <option value="Jewellery">Jewellery</option>
                 <option value="Other">Other</option>
               </select>
             </div>
-    
+
             {/* Description */}
             <div>
               <label className="text-gray-400 text-sm mb-2 block">

@@ -115,6 +115,15 @@ const Browse = () => {
               <option value="Sports" className="bg-[#0d0d2b]">
                 Sports
               </option>
+              <option value="Tools" className="bg-[#0d0d2b]">
+                Tools
+              </option>
+              <option value="Furniture" className="bg-[#0d0d2b]">
+                Furniture
+              </option>
+              <option value="Jewellery" className="bg-[#0d0d2b]">
+                Jewellery
+              </option>
               <option value="Other" className="bg-[#0d0d2b]">
                 Other
               </option>
