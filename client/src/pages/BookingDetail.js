@@ -58,11 +58,10 @@ const BookingDetail = () => {
     try {
       const { data } = await axios.get(
         `https://borrvio.onrender.com/api/agreements/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
-      window.open(`https://borrvio.onrender.com${data.pdfUrl}`, "_blank");
+      // Direct Cloudinary URL open karo
+      window.open(data.pdfUrl, "_blank");
     } catch (error) {
       toast.error("Agreement not found!");
     }

@@ -1,7 +1,7 @@
+const Agreement = require("../models/Agreement");
 const Booking = require("../models/Booking");
 const Item = require("../models/Item");
 const User = require("../models/User");
-const Agreement = require("../models/Agreement");
 
 const {
   sendBookingRequestEmail,
@@ -92,6 +92,57 @@ const updateBookingStatus = async (req, res) => {
     if (status === "Accepted") {
       const agreementId = `AGR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
+      const PDFDocument = require("pdfkit");
+      const cloudinary = require("cloudinary").v2;
+      const { Readable } = require("stream");
+
+      // PDF generate karo
+      const doc = new PDFDocument();
+      const chunks = [];
+      doc.on("data", (chunk) => chunks.push(chunk));
+
+      doc.fontSize(20).text("BORRVIO RENTAL AGREEMENT", { align: "center" });
+      doc.moveDown();
+      doc.fontSize(12).text(`Agreement ID: ${agreementId}`);
+      doc.text(`Date: ${new Date().toDateString()}`);
+      doc.moveDown();
+      doc.text(`Owner: ${booking.owner.name}`);
+      doc.text(`Renter: ${booking.renter.name}`);
+      doc.text(`Item: ${booking.item.name}`);
+      doc.moveDown();
+      doc.text(`Rental Start: ${new Date(booking.startDate).toDateString()}`);
+      doc.text(`Rental End: ${new Date(booking.endDate).toDateString()}`);
+      doc.text(`Total Days: ${booking.totalDays}`);
+      doc.moveDown();
+      doc.text(`Total Amount: ₹${booking.totalAmount}`);
+      doc.text(`Security Deposit: ₹${booking.depositAmount}`);
+      doc.moveDown();
+      doc.text(
+        "Terms: Item must be returned in same condition. Damage will result in deposit deduction.",
+        {
+          width: 410,
+          align: "justify",
+        },
+      );
+      doc.end();
+
+      await new Promise((resolve) => doc.on("end", resolve));
+      const pdfBuffer = Buffer.concat(chunks);
+
+      // Cloudinary pe upload karo
+      const uploadResult = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "raw",
+            folder: "agreements",
+            public_id: agreementId,
+          },
+          (error, result) => (error ? reject(error) : resolve(result)),
+        );
+        Readable.from(pdfBuffer).pipe(uploadStream);
+      });
+
+      // DB mein save karo
       await Agreement.create({
         booking: booking._id,
         agreementId,
@@ -102,7 +153,7 @@ const updateBookingStatus = async (req, res) => {
         endDate: booking.endDate,
         totalAmount: booking.totalAmount,
         depositAmount: booking.depositAmount,
-        pdfUrl: null, // Cloudinary se generate hoga
+        pdfUrl: uploadResult.secure_url,
       });
 
       await sendBookingAcceptedEmail(
