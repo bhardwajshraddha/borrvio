@@ -55,6 +55,7 @@ const RenterDashboard = () => {
       navigate("/login");
       return;
     }
+
     fetchDashboard();
     fetchBookings();
   }, [token, navigate, fetchDashboard, fetchBookings]);
@@ -91,6 +92,7 @@ const RenterDashboard = () => {
         name: "Borrvio",
         description: `Rental Payment — ${booking.item?.name}`,
         order_id: data.orderId,
+
         handler: async (response) => {
           try {
             await axios.post(
@@ -101,16 +103,26 @@ const RenterDashboard = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               },
-              { headers: { Authorization: `Bearer ${token}` } },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
             );
+
             toast.success("Payment Successful!");
             fetchBookings();
           } catch (error) {
             toast.error("Payment verification failed!");
           }
         },
-        prefill: { name: user.name, email: user.email },
-        theme: { color: "#f97316" },
+
+        prefill: {
+          name: user.name,
+          email: user.email,
+        },
+
+        theme: {
+          color: "#f97316",
+        },
       };
 
       const rzp = new window.Razorpay(options);
@@ -136,6 +148,7 @@ const RenterDashboard = () => {
         >
           Borrvio
         </h1>
+
         <div className="flex gap-3">
           <button
             onClick={() => navigate("/browse")}
@@ -143,28 +156,33 @@ const RenterDashboard = () => {
           >
             Browse
           </button>
+
           <button
             onClick={() => navigate("/owner-dashboard")}
             className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Owner View
           </button>
+
           <button
             onClick={() => navigate("/profile")}
             className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
-            <FiUser /> Profile
+            <FiUser />
+            Profile
           </button>
         </div>
       </nav>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
           <h2 className="text-4xl font-bold">Renter Dashboard</h2>
+
           <p className="text-gray-400 mt-2">
             Welcome,{" "}
             <span className="gradient-text font-semibold">{user.name}</span>!
@@ -182,6 +200,7 @@ const RenterDashboard = () => {
                 color: "text-yellow-400",
                 bg: "bg-yellow-400/10",
               },
+
               {
                 icon: <FiShoppingBag size={24} />,
                 label: "Active",
@@ -189,6 +208,7 @@ const RenterDashboard = () => {
                 color: "text-green-400",
                 bg: "bg-green-400/10",
               },
+
               {
                 icon: <FiCheckCircle size={24} />,
                 label: "Completed",
@@ -196,6 +216,7 @@ const RenterDashboard = () => {
                 color: "text-blue-400",
                 bg: "bg-blue-400/10",
               },
+
               {
                 icon: <FiDollarSign size={24} />,
                 label: "Total Spent",
@@ -216,7 +237,9 @@ const RenterDashboard = () => {
                 >
                   {stat.icon}
                 </div>
+
                 <p className="text-gray-400 text-sm">{stat.label}</p>
+
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>
                   {stat.value}
                 </p>
@@ -227,6 +250,7 @@ const RenterDashboard = () => {
 
         {/* Bookings */}
         <h3 className="text-2xl font-bold mb-6">My Bookings</h3>
+
         {loading ? (
           <div className="flex justify-center py-10">
             <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
@@ -234,7 +258,9 @@ const RenterDashboard = () => {
         ) : bookings.length === 0 ? (
           <div className="glass rounded-3xl p-10 border border-white/10 text-center">
             <p className="text-5xl mb-4">🛒</p>
+
             <p className="text-gray-400 mb-4">No bookings yet!</p>
+
             <button
               onClick={() => navigate("/browse")}
               className="px-6 py-2 btn-gradient rounded-xl glow-orange"
@@ -254,17 +280,24 @@ const RenterDashboard = () => {
               >
                 <div className="flex justify-between items-start flex-wrap gap-4">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-lg">
+                    {/* CLICKABLE ITEM NAME */}
+                    <h4
+                      className="font-semibold text-lg cursor-pointer hover:text-orange-400 transition"
+                      onClick={() => navigate(`/booking/${booking._id}`)}
+                    >
                       {booking.item?.name}
                     </h4>
+
                     <p className="text-gray-400 text-sm mt-1">
                       Owner:{" "}
                       <span className="text-white">{booking.owner?.name}</span>
                     </p>
+
                     <p className="text-gray-400 text-sm">
                       {new Date(booking.startDate).toDateString()} →{" "}
                       {new Date(booking.endDate).toDateString()}
                     </p>
+
                     <p className="text-gray-400 text-sm mt-1">
                       Total:{" "}
                       <span className="gradient-text font-semibold">
@@ -275,6 +308,7 @@ const RenterDashboard = () => {
                       </span>
                     </p>
 
+                    {/* PAYMENT BUTTON */}
                     {booking.status === "Accepted" &&
                       booking.paymentStatus !== "Paid" && (
                         <button
@@ -286,15 +320,29 @@ const RenterDashboard = () => {
                         </button>
                       )}
 
+                    {/* PAYMENT STATUS */}
                     {booking.paymentStatus === "Paid" && (
                       <p className="mt-3 text-center text-green-400 font-semibold text-sm">
                         ✅ Payment Done
                       </p>
                     )}
+
+                    {/* RATE BOOKING BUTTON */}
+                    {booking.status === "Completed" && (
+                      <button
+                        onClick={() => navigate(`/booking/${booking._id}`)}
+                        className="mt-2 text-sm text-orange-400 hover:underline"
+                      >
+                        ⭐ Rate This Booking
+                      </button>
+                    )}
                   </div>
 
+                  {/* STATUS BADGE */}
                   <span
-                    className={`${statusColor(booking.status)} px-3 py-1 rounded-full text-sm font-semibold h-fit`}
+                    className={`${statusColor(
+                      booking.status,
+                    )} px-3 py-1 rounded-full text-sm font-semibold h-fit`}
                   >
                     {booking.status}
                   </span>
