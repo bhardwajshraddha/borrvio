@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
 const connectDB = require("./config/db");
-const cloudinary = require("cloudinary").v2; // ✅ ADD
+const cloudinary = require("cloudinary").v2; //  ADD
 const authRoutes = require("./routes/authRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
@@ -16,11 +16,11 @@ const path = require("path");
 
 connectDB();
 
-// Cloudinary config
+//  Cloudinary config
 cloudinary.config({
-  cloud_name: dcpi9wqk8,
-  api_key: 831221914222138,
-  api_secret: iKg - XZ45sjSiopxDXCWSO7OGBB4,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const app = express();
