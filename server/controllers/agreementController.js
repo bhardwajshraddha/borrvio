@@ -1,40 +1,33 @@
-const Agreement = require('../models/Agreement');
-const Booking = require('../models/Booking');
-const PDFDocument = require('pdfkit');
-const path = require('path');
-const fs = require('fs');
+const Agreement = require("../models/Agreement");
+const Booking = require("../models/Booking");
+const PDFDocument = require("pdfkit");
+const cloudinary = require("cloudinary").v2;
+const { Readable } = require("stream");
 
-// Generate Agreement
 const generateAgreement = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.bookingId)
-      .populate('owner', 'name')
-      .populate('renter', 'name')
-      .populate('item', 'name');
+      .populate("owner", "name")
+      .populate("renter", "name")
+      .populate("item", "name");
 
-    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    if (booking.status !== 'Accepted') {
-      return res.status(400).json({ message: 'Agreement only for accepted bookings' });
+    if (booking.status !== "Accepted") {
+      return res
+        .status(400)
+        .json({ message: "Agreement only for accepted bookings" });
     }
 
-    // Generate unique agreement ID
     const agreementId = `AGR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // Create PDF
+    //  PDF memory buffer
     const doc = new PDFDocument();
-    const fileName = `${agreementId}.pdf`;
-    const filePath = path.join(__dirname, '..', 'agreements', fileName);
+    const chunks = [];
 
-    // Create agreements folder if not exists
-    if (!fs.existsSync(path.join(__dirname, '..', 'agreements'))) {
-      fs.mkdirSync(path.join(__dirname, '..', 'agreements'));
-    }
+    doc.on("data", (chunk) => chunks.push(chunk));
 
-    doc.pipe(fs.createWriteStream(filePath));
-
-    // PDF Content
-    doc.fontSize(20).text('BORRVIO RENTAL AGREEMENT', { align: 'center' });
+    doc.fontSize(20).text("BORRVIO RENTAL AGREEMENT", { align: "center" });
     doc.moveDown();
     doc.fontSize(12).text(`Agreement ID: ${agreementId}`);
     doc.text(`Date: ${new Date().toDateString()}`);
@@ -50,14 +43,29 @@ const generateAgreement = async (req, res) => {
     doc.text(`Total Amount: ₹${booking.totalAmount}`);
     doc.text(`Security Deposit: ₹${booking.depositAmount}`);
     doc.moveDown();
-    doc.text('Terms: Item must be returned in same condition. Damage will result in deposit deduction.', {
-      width: 410,
-      align: 'justify'
-    });
-
+    doc.text(
+      "Terms: Item must be returned in same condition. Damage will result in deposit deduction.",
+      {
+        width: 410,
+        align: "justify",
+      },
+    );
     doc.end();
 
-    // Save to DB
+    // PDF ready  wait
+    await new Promise((resolve) => doc.on("end", resolve));
+    const pdfBuffer = Buffer.concat(chunks);
+
+    //  Cloudinary  upload
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: "raw", folder: "agreements", public_id: agreementId },
+        (error, result) => (error ? reject(error) : resolve(result)),
+      );
+      Readable.from(pdfBuffer).pipe(uploadStream);
+    });
+
+    //  DB mein Cloudinary URL save
     const agreement = await Agreement.create({
       booking: booking._id,
       agreementId,
@@ -68,26 +76,28 @@ const generateAgreement = async (req, res) => {
       endDate: booking.endDate,
       totalAmount: booking.totalAmount,
       depositAmount: booking.depositAmount,
-      pdfUrl: `/agreements/${fileName}`
+      pdfUrl: uploadResult.secure_url,
     });
 
     res.status(201).json({
-      message: 'Agreement generated successfully',
+      message: "Agreement generated successfully",
       agreementId,
-      pdfUrl: `/agreements/${fileName}`,
-      agreement
+      pdfUrl: uploadResult.secure_url,
+      agreement,
     });
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Agreement error:", error);
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 };
 
-// Get Agreement
 const getAgreement = async (req, res) => {
   try {
-    const agreement = await Agreement.findOne({ booking: req.params.bookingId });
-    if (!agreement) return res.status(404).json({ message: 'Agreement not found' });
+    const agreement = await Agreement.findOne({
+      booking: req.params.bookingId,
+    });
+    if (!agreement)
+      return res.status(404).json({ message: "Agreement not found" });
     res.status(200).json(agreement);
   } catch (error) {
     res.status(500).json({ message: error.message });
