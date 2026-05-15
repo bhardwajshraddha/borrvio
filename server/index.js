@@ -1,8 +1,8 @@
 const dotenv = require("dotenv");
-dotenv.config(); // ← SABSE PEHLE becouse of env file
+dotenv.config();
 const express = require("express");
-//const cors = require("cors");
 const connectDB = require("./config/db");
+const cloudinary = require("cloudinary").v2; // ✅ ADD
 const authRoutes = require("./routes/authRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
@@ -13,31 +13,39 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const path = require("path");
+
 connectDB();
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: dcpi9wqk8,
+  api_key: 831221914222138,
+  api_secret: iKg - XZ45sjSiopxDXCWSO7OGBB4,
+});
+
 const app = express();
-// CORS ki jagah yeh middleware added  - cors package ki zaroorat nahi
+
+// CORS middleware
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://borrvio.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
   ];
-
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
-
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   );
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   next();
 });
+
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/items", itemRoutes);
@@ -57,7 +65,6 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Multer error handler
 app.use((err, req, res, next) => {
   if (err.name === "MulterError") {
     return res.status(400).json({ message: err.message });
