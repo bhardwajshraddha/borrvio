@@ -54,7 +54,6 @@ const createBooking = async (req, res) => {
 
     // Send email to owner
     console.log("Sending email to:", item.owner.email);
-
     const renter = await User.findById(req.user._id);
     console.log("Renter name:", renter.name);
 
@@ -89,7 +88,7 @@ const updateBookingStatus = async (req, res) => {
       }
     }
 
-    // 🔥 ACCEPTED STATUS LOGIC + AGREEMENT GENERATION
+    // ✅ ACCEPTED — Agreement ek baar banao + email bhejo
     if (status === "Accepted") {
       const agreementId = `AGR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
@@ -103,6 +102,7 @@ const updateBookingStatus = async (req, res) => {
         endDate: booking.endDate,
         totalAmount: booking.totalAmount,
         depositAmount: booking.depositAmount,
+        pdfUrl: null, // Cloudinary se generate hoga
       });
 
       await sendBookingAcceptedEmail(
@@ -112,6 +112,7 @@ const updateBookingStatus = async (req, res) => {
       );
     }
 
+    // ✅ CANCELLED — email bhejo
     if (status === "Cancelled") {
       await sendBookingCancelledEmail(
         booking.renter.email,
@@ -120,6 +121,7 @@ const updateBookingStatus = async (req, res) => {
       );
     }
 
+    // ✅ COMPLETED — deposit status update karo
     if (status === "Completed" && conditionOnReturn) {
       booking.conditionOnReturn = conditionOnReturn;
 
@@ -134,23 +136,7 @@ const updateBookingStatus = async (req, res) => {
 
     booking.status = status;
     await booking.save();
-    // Auto generate agreement when Accepted
-    if (status === "Accepted") {
-      const Agreement = require("../models/Agreement");
-      const agreementId = `AGR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      await Agreement.create({
-        booking: booking._id,
-        agreementId,
-        ownerName: booking.owner.name,
-        renterName: booking.renter.name,
-        itemName: booking.item.name,
-        startDate: booking.startDate,
-        endDate: booking.endDate,
-        totalAmount: booking.totalAmount,
-        depositAmount: booking.depositAmount,
-      });
-    }
     res.status(200).json(booking);
   } catch (error) {
     res.status(500).json({ message: error.message });
