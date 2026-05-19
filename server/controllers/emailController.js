@@ -1,8 +1,14 @@
-const transporter = require('../config/emailConfig');
-const sendBookingRequestEmail = async (ownerEmail, ownerName, itemName, renterName) => {
+const resend = require("../config/emailConfig");
+
+const sendBookingRequestEmail = async (
+  ownerEmail,
+  ownerName,
+  itemName,
+  renterName,
+) => {
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    await resend.emails.send({
+      from: "Borrvio <onboarding@resend.dev>",
       to: ownerEmail,
       subject: `New Booking Request — Borrvio`,
       html: `
@@ -12,17 +18,18 @@ const sendBookingRequestEmail = async (ownerEmail, ownerName, itemName, renterNa
         <p>Login to Borrvio to accept or decline the request.</p>
         <br/>
         <p>Team Borrvio 🚀</p>
-      `
+      `,
     });
-    console.log('Email sent:', info.response);
+    console.log("Email sent!");
   } catch (error) {
-    console.error('Email error:', error.message);
+    console.error("Email error:", error.message);
   }
 };
+
 const sendBookingAcceptedEmail = async (renterEmail, renterName, itemName) => {
   try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    await resend.emails.send({
+      from: "Borrvio <onboarding@resend.dev>",
       to: renterEmail,
       subject: `Booking Accepted — Borrvio`,
       html: `
@@ -32,18 +39,18 @@ const sendBookingAcceptedEmail = async (renterEmail, renterName, itemName) => {
         <p>Login to Borrvio to view your booking details.</p>
         <br/>
         <p>Team Borrvio 🚀</p>
-      `
+      `,
     });
-    console.log('Booking accepted email sent!');
+    console.log("Booking accepted email sent!");
   } catch (error) {
-    console.error('Email error:', error.message);
+    console.error("Email error:", error.message);
   }
 };
 
 const sendBookingCancelledEmail = async (email, name, itemName) => {
   try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    await resend.emails.send({
+      from: "Borrvio <onboarding@resend.dev>",
       to: email,
       subject: `Booking Cancelled — Borrvio`,
       html: `
@@ -52,12 +59,16 @@ const sendBookingCancelledEmail = async (email, name, itemName) => {
         <p>Booking for <b>${itemName}</b> has been cancelled.</p>
         <br/>
         <p>Team Borrvio 🚀</p>
-      `
+      `,
     });
-    console.log('Cancellation email sent!');
+    console.log("Cancellation email sent!");
   } catch (error) {
-    console.error('Email error:', error.message);
+    console.error("Email error:", error.message);
   }
 };
 
-module.exports = { sendBookingRequestEmail, sendBookingAcceptedEmail, sendBookingCancelledEmail };
+module.exports = {
+  sendBookingRequestEmail,
+  sendBookingAcceptedEmail,
+  sendBookingCancelledEmail,
+};
