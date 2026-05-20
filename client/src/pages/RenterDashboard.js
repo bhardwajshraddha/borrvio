@@ -309,17 +309,14 @@ const RenterDashboard = () => {
                     </p>
 
                     {/* PAYMENT BUTTON */}
-                    {booking.status === "Accepted" &&
-                      booking.paymentStatus !== "Paid" && (
-                        <button
-                          onClick={() => handlePayment(booking)}
-                          className="mt-3 w-full bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 py-2 rounded-xl text-sm font-semibold transition"
-                        >
-                          💳 Pay Now — ₹
-                          {booking.totalAmount + booking.depositAmount}
-                        </button>
-                      )}
-
+                    {booking.status === "Accepted" && (
+                      <button
+                        onClick={() => navigate(`/booking/${booking._id}`)}
+                        className="mt-2 w-full glass border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 py-2 rounded-xl text-sm font-semibold transition"
+                      >
+                        📄 View Agreement & Pay
+                      </button>
+                    )}
                     {/* PAYMENT STATUS */}
                     {booking.paymentStatus === "Paid" && (
                       <p className="mt-3 text-center text-green-400 font-semibold text-sm">
