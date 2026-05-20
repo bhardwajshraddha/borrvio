@@ -29,6 +29,7 @@ const app = express();
 app.use((req, res, next) => {
   const allowedOrigins = [
     "https://borrvio.vercel.app",
+    "https://borrvio-klsv0hio0-shraddha-bhardwaj-s-projects.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
   ];
