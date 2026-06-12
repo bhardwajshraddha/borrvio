@@ -3,31 +3,57 @@ import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FiMail, FiLock, FiArrowRight } from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff } from "react-icons/fi";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
+  // Show/Hide Password
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Remember Me
+  const [rememberMe, setRememberMe] = useState(false);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const { data } = await axios.post(
         "https://borrvio.onrender.com/api/auth/login",
         formData,
       );
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
+
+      // Remember Me Logic
+      if (rememberMe) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data));
+      } else {
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("user", JSON.stringify(data));
+      }
+
       toast.success("Welcome back to Borrvio!");
       navigate("/browse");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed!");
+      toast.error(
+        error.response?.data?.message ||
+          "Incorrect email or password. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -56,10 +82,13 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Email */}
           <div>
             <label className="text-gray-400 text-sm mb-2 block">Email</label>
+
             <div className="relative">
               <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+
               <input
                 type="email"
                 name="email"
@@ -72,33 +101,62 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Password */}
           <div>
             <label className="text-gray-400 text-sm mb-2 block">Password</label>
+
             <div className="relative">
               <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-12 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center gap-2 mt-3">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                className="w-4 h-4 accent-orange-500 cursor-pointer"
+              />
+
+              <label
+                htmlFor="rememberMe"
+                className="text-gray-400 text-sm cursor-pointer"
+              >
+                Remember Me
+              </label>
             </div>
           </div>
 
+          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 flex items-center justify-center gap-2 glow-orange"
+            className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg mt-2 flex items-center justify-center gap-2 glow-orange disabled:opacity-70"
           >
             {loading ? (
               "Logging in..."
             ) : (
               <>
-                {" "}
-                Login <FiArrowRight />{" "}
+                Login <FiArrowRight />
               </>
             )}
           </button>

@@ -10,6 +10,8 @@ import {
   FiPhone,
   FiMapPin,
   FiArrowRight,
+  FiEye,
+  FiEyeOff,
 } from "react-icons/fi";
 
 const Register = () => {
@@ -23,7 +25,7 @@ const Register = () => {
     phone: "",
   });
   const [loading, setLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -41,7 +43,10 @@ const Register = () => {
       toast.success("Welcome to Borrvio!");
       navigate("/browse");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed!");
+      toast.error(
+        error.response?.data?.message ||
+          "Registration failed. Please check your details.",
+      );
     } finally {
       setLoading(false);
     }
@@ -105,17 +110,27 @@ const Register = () => {
 
           <div>
             <label className="text-gray-400 text-sm mb-2 block">Password</label>
+
             <div className="relative">
               <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Create a password"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-11 py-3 text-white placeholder-gray-600 focus:outline-none input-glow transition-all"
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition"
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
             </div>
           </div>
 

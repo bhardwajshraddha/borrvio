@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 dotenv.config();
+const rateLimit = require("express-rate-limit");
 const express = require("express");
 const connectDB = require("./config/db");
 const cloudinary = require("cloudinary").v2; //  ADD
@@ -22,7 +23,21 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: {
+    message: "Too many login attempts. Please try again after 15 minutes.",
+  },
+});
 
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  message: {
+    message: "Too many accounts created. Please try again after 1 hour.",
+  },
+});
 const app = express();
 
 // CORS middleware
@@ -48,6 +63,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use("/api/auth/login", loginLimiter);
+app.use("/api/auth/register", registerLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/bookings", bookingRoutes);
