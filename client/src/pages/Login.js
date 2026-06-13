@@ -39,10 +39,15 @@ const Login = () => {
       );
 
       // Remember Me Logic
+
       if (rememberMe) {
+        sessionStorage.clear();
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data));
       } else {
+        localStorage.clear();
+
         sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("user", JSON.stringify(data));
       }
@@ -126,7 +131,14 @@ const Login = () => {
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
-
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-orange-400 text-sm hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             {/* Remember Me */}
             <div className="flex items-center gap-2 mt-3">
               <input
