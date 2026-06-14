@@ -1,6 +1,4 @@
-- [ ] Add Delete function call (Delete endpoint) to OwnerDashboard for listed items
-- [ ] Add Deactivate (toggle availability) function call to OwnerDashboard for listed items
-- [ ] Verify server has PATCH /api/items/:id/toggle and DELETE /api/items/:id
-- [ ] Wire UI buttons to the new functions (toast + refresh)
-- [ ] Run frontend lint/build or at least quick React build/test command
-- [ ] Update RenterDashboard: show Pay Now button when booking.status === 'Accepted' && booking.paymentStatus !== 'Paid' and show ✅ Payment Done when booking.paymentStatus === 'Paid'
+- [x] Explain cause of runtime error (fetchWishlistStatus undefined)
+- [x] Remove call to undefined fetchWishlistStatus from client/src/pages/Browse.js (prevents crash)
+- [ ] (Optional) Re-add fetchWishlistStatus properly later so wishlist icons are correct on Browse
+- [ ] Run frontend build / tests to verify no runtime errors

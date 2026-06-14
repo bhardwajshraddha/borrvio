@@ -31,9 +31,7 @@ const Browse = () => {
       setLoading(true);
       const { data } = await axios.get(
         "https://borrvio.onrender.com/api/items",
-        {
-          params: { search, category, city },
-        },
+        { params: { search, category, city } },
       );
       setItems(Array.isArray(data) ? data : data.items || []);
     } catch (error) {
@@ -43,60 +41,66 @@ const Browse = () => {
     }
   }, [search, category, city]);
 
+  const fetchWishlistStatus = useCallback(async () => {
+    if (!token) return; // not logged in — skip silently
+    try {
+      const { data } = await axios.get(
+        "https://borrvio.onrender.com/api/wishlist",
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const ids = data.map((entry) => entry.item?._id);
+      setWishlistedItems(ids);
+    } catch (error) {
+      console.log("Wishlist fetch skipped");
+    }
+  }, [token]);
+
   const toggleWishlist = async (e, itemId) => {
     e.stopPropagation();
-
     if (!token) {
       toast.error("Please login to save items.");
       navigate("/login");
       return;
     }
-
     try {
       if (wishlistedItems.includes(itemId)) {
         await axios.delete(
           `https://borrvio.onrender.com/api/wishlist/${itemId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
-
         setWishlistedItems((prev) => prev.filter((id) => id !== itemId));
-
         toast.success("Removed from wishlist!");
       } else {
         await axios.post(
           "https://borrvio.onrender.com/api/wishlist",
-          {
-            itemId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          { itemId },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
-
         setWishlistedItems((prev) => [...prev, itemId]);
-
         toast.success("Saved to your wishlist ❤️");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
+
+  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearch(searchInput);
     }, 500);
     return () => clearTimeout(timer);
   }, [searchInput]);
+
+  // Fetch items
   useEffect(() => {
     fetchItems();
+  }, [fetchItems]);
+
+  // Fetch wishlist on load
+  useEffect(() => {
     fetchWishlistStatus();
-  }, [fetchItems, token]);
+  }, [fetchWishlistStatus]);
 
   return (
     <div className="gradient-bg min-h-screen text-white">
@@ -127,7 +131,6 @@ const Browse = () => {
           >
             Dashboard
           </button>
-
           <button
             onClick={() => navigate("/profile")}
             className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
@@ -140,6 +143,7 @@ const Browse = () => {
       {/* Filters */}
       <div className="relative z-10 px-10 py-6 glass border-b border-white/5">
         <div className="flex flex-wrap gap-4 max-w-5xl mx-auto">
+          {/* Search */}
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex-1 min-w-[200px] focus-within:border-orange-500/50 transition">
             <FiSearch className="text-gray-400" />
             <input
@@ -151,6 +155,7 @@ const Browse = () => {
             />
           </div>
 
+          {/* Category */}
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2 focus-within:border-orange-500/50 transition">
             <FiTag className="text-gray-400" />
             <select
@@ -189,6 +194,7 @@ const Browse = () => {
             </select>
           </div>
 
+          {/* City */}
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2 focus-within:border-orange-500/50 transition">
             <FiMapPin className="text-gray-400" />
             <input
@@ -236,8 +242,6 @@ const Browse = () => {
                   )}
                 </button>
 
-                {/* Image */}
-                <div className="h-52 bg-white/5 flex items-center justify-center overflow-hidden"></div>
                 {/* Image */}
                 <div className="h-52 bg-white/5 flex items-center justify-center overflow-hidden">
                   {item.images && item.images.length > 0 ? (
