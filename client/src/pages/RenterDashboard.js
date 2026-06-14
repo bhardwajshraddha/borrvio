@@ -10,14 +10,17 @@ import {
   FiDollarSign,
   FiUser,
 } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 
 const RenterDashboard = () => {
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [wishlist, setWishlist] = useState([]);
 
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const fetchDashboard = useCallback(async () => {
@@ -49,6 +52,22 @@ const RenterDashboard = () => {
       setLoading(false);
     }
   }, [token]);
+  const fetchWishlist = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        "https://borrvio.onrender.com/api/wishlist",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setWishlist(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [token]);
 
   useEffect(() => {
     if (!token) {
@@ -58,8 +77,8 @@ const RenterDashboard = () => {
 
     fetchDashboard();
     fetchBookings();
-  }, [token, navigate, fetchDashboard, fetchBookings]);
-
+    fetchWishlist();
+  }, [token, navigate, fetchDashboard, fetchBookings, fetchWishlist]);
   const statusColor = (status) => {
     switch (status) {
       case "Requested":

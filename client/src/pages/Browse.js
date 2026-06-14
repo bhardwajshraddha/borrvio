@@ -2,7 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiSearch, FiMapPin, FiTag, FiPlus, FiUser } from "react-icons/fi";
+import {
+  FiSearch,
+  FiMapPin,
+  FiTag,
+  FiPlus,
+  FiUser,
+  FiHeart,
+} from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Browse = () => {
   const navigate = useNavigate();
@@ -12,6 +21,10 @@ const Browse = () => {
   const [searchInput, setSearchInput] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
+  const [wishlistedItems, setWishlistedItems] = useState([]);
+
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
 
   const fetchItems = useCallback(async () => {
     try {
@@ -29,6 +42,51 @@ const Browse = () => {
       setLoading(false);
     }
   }, [search, category, city]);
+
+  const toggleWishlist = async (e, itemId) => {
+    e.stopPropagation();
+
+    if (!token) {
+      toast.error("Please login to save items.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (wishlistedItems.includes(itemId)) {
+        await axios.delete(
+          `https://borrvio.onrender.com/api/wishlist/${itemId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setWishlistedItems((prev) => prev.filter((id) => id !== itemId));
+
+        toast.success("Removed from wishlist!");
+      } else {
+        await axios.post(
+          "https://borrvio.onrender.com/api/wishlist",
+          {
+            itemId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setWishlistedItems((prev) => [...prev, itemId]);
+
+        toast.success("Saved to your wishlist ❤️");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    }
+  };
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearch(searchInput);
@@ -37,7 +95,8 @@ const Browse = () => {
   }, [searchInput]);
   useEffect(() => {
     fetchItems();
-  }, [fetchItems]);
+    fetchWishlistStatus();
+  }, [fetchItems, token]);
 
   return (
     <div className="gradient-bg min-h-screen text-white">
@@ -163,8 +222,22 @@ const Browse = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => navigate(`/item/${item._id}`)}
-                className="glass rounded-3xl border border-white/10 card-hover cursor-pointer overflow-hidden"
+                className="glass rounded-3xl border border-white/10 card-hover cursor-pointer overflow-hidden relative"
               >
+                {/* Heart Button */}
+                <button
+                  onClick={(e) => toggleWishlist(e, item._id)}
+                  className="absolute top-3 right-3 z-10 w-9 h-9 glass rounded-full flex items-center justify-center border border-white/10 hover:border-red-400 transition"
+                >
+                  {wishlistedItems.includes(item._id) ? (
+                    <FaHeart className="text-red-500" size={14} />
+                  ) : (
+                    <FiHeart className="text-gray-400" size={14} />
+                  )}
+                </button>
+
+                {/* Image */}
+                <div className="h-52 bg-white/5 flex items-center justify-center overflow-hidden"></div>
                 {/* Image */}
                 <div className="h-52 bg-white/5 flex items-center justify-center overflow-hidden">
                   {item.images && item.images.length > 0 ? (

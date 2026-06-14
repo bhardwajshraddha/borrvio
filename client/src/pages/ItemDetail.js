@@ -1,3 +1,12 @@
+import { FaHeart } from "react-icons/fa";
+import {
+  FiHeart,
+  FiMapPin,
+  FiShield,
+  FiCalendar,
+  FiArrowLeft,
+  FiStar,
+} from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,9 +31,59 @@ const ItemDetail = () => {
   const [booking, setBooking] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const [startX, setStartX] = useState(0);
+  const [wishlisted, setWishlisted] = useState(false);
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  const fetchWishlistStatus = async () => {
+    if (!token) return;
+    try {
+      const { data } = await axios.get(
+        "https://borrvio.onrender.com/api/wishlist",
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const exists = data.some((entry) => entry.item && entry.item._id === id);
+      setWishlisted(exists);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const toggleWishlist = async () => {
+    if (!token) {
+      toast.error("Please login to save items.");
+      navigate("/login");
+      return;
+    }
 
-  const token = localStorage.getItem("token");
+    try {
+      if (wishlisted) {
+        await axios.delete(`https://borrvio.onrender.com/api/wishlist/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
+        setWishlisted(false);
+        toast.success("Removed from wishlist!");
+      } else {
+        await axios.post(
+          "https://borrvio.onrender.com/api/wishlist",
+          {
+            itemId: id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setWishlisted(true);
+        toast.success("Saved to your wishlist ❤️");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    }
+  };
   useEffect(() => {
     const fetchItem = async () => {
       try {
@@ -40,7 +99,8 @@ const ItemDetail = () => {
       }
     };
     fetchItem();
-  }, [id, navigate]);
+    fetchWishlistStatus(); // wishlist status check on load
+  }, [id, token]);
 
   const calculateDays = () => {
     if (!startDate || !endDate) return 0;
@@ -277,9 +337,23 @@ const ItemDetail = () => {
           >
             <div className="flex justify-between items-start mb-3">
               <h1 className="text-3xl font-bold">{item?.name}</h1>
-              <span className="btn-gradient px-3 py-1 rounded-full text-sm">
-                {item?.category}
-              </span>
+
+              <div className="flex items-center gap-3">
+                <span className="btn-gradient px-3 py-1 rounded-full text-sm">
+                  {item?.category}
+                </span>
+
+                <button
+                  onClick={toggleWishlist}
+                  className="text-2xl transition-all hover:scale-110"
+                >
+                  {wishlisted ? (
+                    <FaHeart className="text-red-500" />
+                  ) : (
+                    <FiHeart className="text-gray-400 hover:text-red-400" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 text-gray-400 mb-4">
