@@ -24,12 +24,14 @@ const ItemDetail = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [booking, setBooking] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [startX, setStartX] = useState(0);
   const [wishlisted, setWishlisted] = useState(false);
 
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
 
-  // ---------------- FETCH ITEM ----------------
+  // ✅ FETCH ITEM
   useEffect(() => {
     const fetchItem = async () => {
       try {
@@ -48,16 +50,13 @@ const ItemDetail = () => {
     fetchItem();
   }, [id, navigate]);
 
-  // ---------------- FETCH WISHLIST STATUS ----------------
   const fetchWishlistStatus = useCallback(async () => {
-    if (!token) return; // 🔥 no token = skip (fixes 401 spam)
+    if (!token) return;
 
     try {
       const { data } = await axios.get(
         "https://borrvio.onrender.com/api/wishlist",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       const exists = data.some((entry) => entry.item?._id === id);
@@ -72,10 +71,10 @@ const ItemDetail = () => {
     fetchWishlistStatus();
   }, [fetchWishlistStatus]);
 
-  // ---------------- TOGGLE WISHLIST ----------------
+  // ✅ TOGGLE WISHLIST
   const toggleWishlist = async () => {
     if (!token) {
-      toast.error("Please login first!");
+      toast.error("Please login to save items.");
       navigate("/login");
       return;
     }
@@ -92,20 +91,18 @@ const ItemDetail = () => {
         await axios.post(
           "https://borrvio.onrender.com/api/wishlist",
           { itemId: id },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         setWishlisted(true);
-        toast.success("Saved to wishlist ❤️");
+        toast.success("Saved to your wishlist ❤️");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
 
-  // ---------------- BOOKING ----------------
+  // ✅ CALCULATE DAYS
   const calculateDays = () => {
     if (!startDate || !endDate) return 0;
     return Math.ceil(
@@ -113,6 +110,7 @@ const ItemDetail = () => {
     );
   };
 
+  // ✅ BOOKING
   const handleBooking = async () => {
     if (!token) {
       toast.error("Please login first!");
@@ -136,9 +134,7 @@ const ItemDetail = () => {
       await axios.post(
         "https://borrvio.onrender.com/api/bookings",
         { itemId: id, startDate, endDate },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       toast.success("Booking request sent!");
@@ -157,11 +153,14 @@ const ItemDetail = () => {
       </div>
     );
 
+  const days = calculateDays();
+  const totalAmount = days * (item?.pricePerDay || 0);
+
   return (
     <div className="gradient-bg min-h-screen text-white">
-      {/* SIMPLE HEADER PART (your UI remains same) */}
+      {/* UI SAME AS YOUR ORIGINAL (UNCHANGED FOR SAFETY) */}
 
-      {/* Wishlist Button */}
+      {/* Wishlist Button FIX ONLY */}
       <button onClick={toggleWishlist}>
         {wishlisted ? (
           <FaHeart className="text-red-500" />
