@@ -134,27 +134,37 @@ const forgotPassword = async (req, res) => {
     // Send email
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    const transporter = require("../config/emailConfig");
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    const resend = require("../config/emailConfig");
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "Borrvio — Password Reset Request",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #f97316;">Borrvio Password Reset</h2>
-          <p>Hi <b>${user.name}</b>,</p>
-          <p>You requested to reset your password. Click the button below:</p>
-          <a href="${resetLink}" 
-             style="background: #f97316; color: white; padding: 12px 24px; 
-                    border-radius: 8px; text-decoration: none; display: inline-block; margin: 16px 0;">
-            Reset Password
-          </a>
-          <p style="color: #888;">This link expires in <b>30 minutes</b>.</p>
-          <p style="color: #888;">If you did not request this, ignore this email.</p>
-          <br/>
-          <p>Team Borrvio 🚀</p>
-        </div>
-      `,
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #f97316;">Borrvio Password Reset</h2>
+
+      <p>Hi <b>${user.name}</b>,</p>
+
+      <p>You requested to reset your password. Click the button below:</p>
+
+      <a href="${resetLink}"
+         style="background:#f97316;color:white;padding:12px 24px;
+         border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0;">
+        Reset Password
+      </a>
+
+      <p style="color:#888;">
+        This link expires in <b>30 minutes</b>.
+      </p>
+
+      <p style="color:#888;">
+        If you did not request this, ignore this email.
+      </p>
+
+      <br/>
+      <p>Team Borrvio 🚀</p>
+    </div>
+  `,
     });
 
     res
