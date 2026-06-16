@@ -9,6 +9,7 @@ import {
   FiCheckCircle,
   FiDollarSign,
   FiUser,
+  FiMapPin,
 } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 
@@ -27,9 +28,7 @@ const RenterDashboard = () => {
     try {
       const { data } = await axios.get(
         "https://borrvio.onrender.com/api/dashboard/renter",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setDashboard(data);
     } catch (error) {
@@ -41,9 +40,7 @@ const RenterDashboard = () => {
     try {
       const { data } = await axios.get(
         "https://borrvio.onrender.com/api/bookings/my",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setBookings(data);
     } catch (error) {
@@ -52,35 +49,43 @@ const RenterDashboard = () => {
       setLoading(false);
     }
   }, [token]);
+
   const fetchWishlist = useCallback(async () => {
     if (!token) return;
-
     try {
       const { data } = await axios.get(
         "https://borrvio.onrender.com/api/wishlist",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
-
       setWishlist(data);
     } catch (error) {
       console.log("Wishlist fetch skipped");
     }
   }, [token]);
 
+  const removeFromWishlist = async (itemId) => {
+    try {
+      await axios.delete(
+        `https://borrvio.onrender.com/api/wishlist/${itemId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success("Removed from wishlist!");
+      fetchWishlist();
+    } catch (error) {
+      toast.error("Failed to remove!");
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
-
     fetchDashboard();
     fetchBookings();
     fetchWishlist();
   }, [token, navigate, fetchDashboard, fetchBookings, fetchWishlist]);
+
   const statusColor = (status) => {
     switch (status) {
       case "Requested":
@@ -113,7 +118,6 @@ const RenterDashboard = () => {
         name: "Borrvio",
         description: `Rental Payment — ${booking.item?.name}`,
         order_id: data.orderId,
-
         handler: async (response) => {
           try {
             await axios.post(
@@ -124,26 +128,16 @@ const RenterDashboard = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               },
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              },
+              { headers: { Authorization: `Bearer ${token}` } },
             );
-
             toast.success("Payment Successful!");
             fetchBookings();
           } catch (error) {
             toast.error("Payment verification failed!");
           }
         },
-
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
-
-        theme: {
-          color: "#f97316",
-        },
+        prefill: { name: user.name, email: user.email },
+        theme: { color: "#f97316" },
       };
 
       const rzp = new window.Razorpay(options);
@@ -169,7 +163,6 @@ const RenterDashboard = () => {
         >
           Borrvio
         </h1>
-
         <div className="flex gap-3">
           <button
             onClick={() => navigate("/browse")}
@@ -177,20 +170,17 @@ const RenterDashboard = () => {
           >
             Browse
           </button>
-
           <button
             onClick={() => navigate("/owner-dashboard")}
             className="px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
             Owner View
           </button>
-
           <button
             onClick={() => navigate("/profile")}
             className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-xl hover:border-orange-500/50 transition"
           >
-            <FiUser />
-            Profile
+            <FiUser /> Profile
           </button>
         </div>
       </nav>
@@ -203,7 +193,6 @@ const RenterDashboard = () => {
           className="mb-8"
         >
           <h2 className="text-4xl font-bold">Renter Dashboard</h2>
-
           <p className="text-gray-400 mt-2">
             Welcome,{" "}
             <span className="gradient-text font-semibold">{user.name}</span>!
@@ -221,7 +210,6 @@ const RenterDashboard = () => {
                 color: "text-yellow-400",
                 bg: "bg-yellow-400/10",
               },
-
               {
                 icon: <FiShoppingBag size={24} />,
                 label: "Active",
@@ -229,7 +217,6 @@ const RenterDashboard = () => {
                 color: "text-green-400",
                 bg: "bg-green-400/10",
               },
-
               {
                 icon: <FiCheckCircle size={24} />,
                 label: "Completed",
@@ -237,7 +224,6 @@ const RenterDashboard = () => {
                 color: "text-blue-400",
                 bg: "bg-blue-400/10",
               },
-
               {
                 icon: <FiDollarSign size={24} />,
                 label: "Total Spent",
@@ -258,9 +244,7 @@ const RenterDashboard = () => {
                 >
                   {stat.icon}
                 </div>
-
                 <p className="text-gray-400 text-sm">{stat.label}</p>
-
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>
                   {stat.value}
                 </p>
@@ -271,7 +255,6 @@ const RenterDashboard = () => {
 
         {/* Bookings */}
         <h3 className="text-2xl font-bold mb-6">My Bookings</h3>
-
         {loading ? (
           <div className="flex justify-center py-10">
             <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
@@ -279,9 +262,7 @@ const RenterDashboard = () => {
         ) : bookings.length === 0 ? (
           <div className="glass rounded-3xl p-10 border border-white/10 text-center">
             <p className="text-5xl mb-4">🛒</p>
-
             <p className="text-gray-400 mb-4">No bookings yet!</p>
-
             <button
               onClick={() => navigate("/browse")}
               className="px-6 py-2 btn-gradient rounded-xl glow-orange"
@@ -301,24 +282,20 @@ const RenterDashboard = () => {
               >
                 <div className="flex justify-between items-start flex-wrap gap-4">
                   <div className="flex-1">
-                    {/* CLICKABLE ITEM NAME */}
                     <h4
                       className="font-semibold text-lg cursor-pointer hover:text-orange-400 transition"
                       onClick={() => navigate(`/booking/${booking._id}`)}
                     >
                       {booking.item?.name}
                     </h4>
-
                     <p className="text-gray-400 text-sm mt-1">
                       Owner:{" "}
                       <span className="text-white">{booking.owner?.name}</span>
                     </p>
-
                     <p className="text-gray-400 text-sm">
                       {new Date(booking.startDate).toDateString()} →{" "}
                       {new Date(booking.endDate).toDateString()}
                     </p>
-
                     <p className="text-gray-400 text-sm mt-1">
                       Total:{" "}
                       <span className="gradient-text font-semibold">
@@ -329,7 +306,6 @@ const RenterDashboard = () => {
                       </span>
                     </p>
 
-                    {/* PAYMENT BUTTON */}
                     {booking.status === "Accepted" && (
                       <button
                         onClick={() => navigate(`/booking/${booking._id}`)}
@@ -338,14 +314,13 @@ const RenterDashboard = () => {
                         📄 View Agreement & Pay
                       </button>
                     )}
-                    {/* PAYMENT STATUS */}
+
                     {booking.paymentStatus === "Paid" && (
                       <p className="mt-3 text-center text-green-400 font-semibold text-sm">
                         ✅ Payment Done
                       </p>
                     )}
 
-                    {/* RATE BOOKING BUTTON */}
                     {booking.status === "Completed" && (
                       <button
                         onClick={() => navigate(`/booking/${booking._id}`)}
@@ -356,11 +331,8 @@ const RenterDashboard = () => {
                     )}
                   </div>
 
-                  {/* STATUS BADGE */}
                   <span
-                    className={`${statusColor(
-                      booking.status,
-                    )} px-3 py-1 rounded-full text-sm font-semibold h-fit`}
+                    className={`${statusColor(booking.status)} px-3 py-1 rounded-full text-sm font-semibold h-fit`}
                   >
                     {booking.status}
                   </span>
@@ -369,6 +341,88 @@ const RenterDashboard = () => {
             ))}
           </div>
         )}
+
+        {/* ❤️ Wishlist Section */}
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <FaHeart className="text-red-500" /> My Wishlist
+          </h3>
+
+          {wishlist.length === 0 ? (
+            <div className="glass rounded-3xl p-10 border border-white/10 text-center">
+              <p className="text-5xl mb-4">🤍</p>
+              <p className="text-gray-400 mb-4">No items in wishlist yet!</p>
+              <button
+                onClick={() => navigate("/browse")}
+                className="px-6 py-2 btn-gradient rounded-xl glow-orange"
+              >
+                Browse Items
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {wishlist.map((entry, i) => (
+                <motion.div
+                  key={entry._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass rounded-3xl border border-white/10 overflow-hidden card-hover"
+                >
+                  {/* Image */}
+                  <div
+                    className="h-40 bg-white/5 flex items-center justify-center cursor-pointer"
+                    onClick={() => navigate(`/item/${entry.item?._id}`)}
+                  >
+                    {entry.item?.images?.length > 0 ? (
+                      <img
+                        src={entry.item.images[0]}
+                        alt={entry.item.name}
+                        className="w-full h-full object-contain p-2"
+                      />
+                    ) : (
+                      <span className="text-4xl">📦</span>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h4
+                      className="font-semibold mb-1 cursor-pointer hover:text-orange-400 transition"
+                      onClick={() => navigate(`/item/${entry.item?._id}`)}
+                    >
+                      {entry.item?.name}
+                    </h4>
+
+                    <div className="flex items-center gap-1 text-gray-500 text-xs mb-1">
+                      <FiMapPin size={10} />
+                      {entry.item?.city}
+                    </div>
+
+                    <p className="gradient-text font-bold mb-3">
+                      ₹{entry.item?.pricePerDay}/day
+                    </p>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => navigate(`/item/${entry.item?._id}`)}
+                        className="flex-1 py-2 btn-gradient rounded-xl text-sm font-semibold glow-orange"
+                      >
+                        View Item
+                      </button>
+                      <button
+                        onClick={() => removeFromWishlist(entry.item?._id)}
+                        className="px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-xl text-sm transition flex items-center justify-center"
+                      >
+                        <FaHeart size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
