@@ -88,7 +88,7 @@ const ItemDetail = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setWishlisted(true);
-        toast.success("Saved to your wishlist ❤️");
+        toast.success("Saved to your wishlist!");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong!");
@@ -145,13 +145,11 @@ const ItemDetail = () => {
   return (
     <div className="gradient-bg min-h-screen text-white">
 
-      {/* Background Orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-orange-500 rounded-full opacity-5 blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500 rounded-full opacity-5 blur-3xl"></div>
       </div>
 
-      {/* Lightbox */}
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black/95 flex items-center justify-center z-50"
@@ -183,16 +181,14 @@ const ItemDetail = () => {
               onClick={() => setSelectedImage(null)}
               className="absolute top-4 right-4 glass w-10 h-10 rounded-full text-white border border-white/20 flex items-center justify-center"
             >
-              ✕
+              X
             </button>
             <div className="absolute bottom-5 flex gap-2">
               {item?.images?.map((_, i) => (
                 <div
                   key={i}
                   className={`h-2 rounded-full transition-all ${
-                    i === imageIndex
-                      ? "bg-orange-500 w-4"
-                      : "bg-gray-500 w-2"
+                    i === imageIndex ? "bg-orange-500 w-4" : "bg-gray-500 w-2"
                   }`}
                 />
               ))}
@@ -201,7 +197,6 @@ const ItemDetail = () => {
         </div>
       )}
 
-      {/* Navbar */}
       <nav className="relative z-10 flex justify-between items-center px-10 py-5 glass border-b border-white/10">
         <h1
           onClick={() => navigate("/")}
@@ -220,10 +215,8 @@ const ItemDetail = () => {
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-          {/* LEFT COLUMN */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
 
-            {/* Main Image */}
             <div
               className="glass rounded-3xl h-80 flex items-center justify-center border border-white/10 cursor-pointer overflow-hidden"
               onClick={() => {
@@ -242,7 +235,6 @@ const ItemDetail = () => {
               )}
             </div>
 
-            {/* Thumbnails */}
             {item?.images?.length > 1 && (
               <div className="flex gap-3 mt-3 overflow-x-auto">
                 {item.images.slice(1).map((img, index) => (
@@ -260,7 +252,6 @@ const ItemDetail = () => {
               </div>
             )}
 
-            {/* Owner Info */}
             <div className="glass rounded-3xl p-4 mt-4 border border-white/10">
               <p className="text-gray-400 text-sm mb-3">Listed by</p>
               <div className="flex items-center gap-3">
@@ -282,7 +273,6 @@ const ItemDetail = () => {
               </div>
             </div>
 
-            {/* Pickup Location */}
             <div className="glass rounded-3xl p-4 mt-4 border border-white/10">
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <FiMapPin className="text-orange-500" /> Pickup Location
@@ -302,40 +292,37 @@ const ItemDetail = () => {
               />
             </div>
 
-            {/* Contact Owner */}
             <div className="glass rounded-3xl p-4 mt-4 border border-white/10">
               <h3 className="font-semibold mb-3">Contact Owner</h3>
-              {item?.owner?.phone ? (
-                
-                  href={`tel:${item.owner.phone}`}
-                  className="flex items-center justify-center gap-2 w-full bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 py-3 rounded-xl font-semibold transition"
-                >
-                  📞 Call Owner
-                </a>
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  Contact info not available
-                </p>
-              )}
-              {item?.owner?.phone && (
-                
-                  href={`https://wa.me/91${item.owner.phone}?text=${encodeURIComponent(
-                    `Hi! I'm interested in renting your ${item.name} on Borrvio.`
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-center gap-2 w-full bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/30 py-3 rounded-xl font-semibold transition mt-3"
-                >
-                  💬 WhatsApp Owner
-                </a>
-              )}
+             {item?.owner?.phone ? (
+  <a
+    href={`tel:${item.owner.phone}`}
+    className="flex items-center justify-center gap-2 w-full bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 py-3 rounded-xl font-semibold transition"
+  >
+    📞 Call Owner
+  </a>
+) : (
+  <p className="text-gray-500 text-sm">
+    Contact info not available
+  </p>
+)}
+             {item?.owner?.phone && (
+  <a
+    href={`https://wa.me/91${item.owner.phone}?text=${encodeURIComponent(
+      `Hi! I am interested in renting your ${item.name} on Borrvio.`
+    )}`}
+    target="_blank"
+    rel="noreferrer"
+    className="flex items-center justify-center gap-2 w-full bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 py-3 rounded-xl font-semibold transition mt-3"
+  >
+    💬 WhatsApp Owner
+  </a>
+)}
             </div>
           </motion.div>
 
-          {/* RIGHT COLUMN */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
 
-            {/* Title + Wishlist */}
             <div className="flex justify-between items-start mb-3">
               <h1 className="text-3xl font-bold">{item?.name}</h1>
               <div className="flex items-center gap-2">
@@ -364,12 +351,11 @@ const ItemDetail = () => {
               {item?.description}
             </p>
 
-            {/* Pricing */}
             <div className="glass rounded-3xl p-5 border border-white/10 mb-6">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-gray-400">Price per day</span>
                 <span className="gradient-text font-bold text-2xl">
-                  ₹{item?.pricePerDay}
+                  Rs.{item?.pricePerDay}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-white/5">
@@ -378,12 +364,11 @@ const ItemDetail = () => {
                   Security Deposit
                 </span>
                 <span className="text-white font-semibold">
-                  ₹{item?.securityDeposit}
+                  Rs.{item?.securityDeposit}
                 </span>
               </div>
             </div>
 
-            {/* Booking */}
             <div className="glass rounded-3xl p-5 border border-white/10">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <FiCalendar className="text-orange-500" /> Select Dates
@@ -415,21 +400,20 @@ const ItemDetail = () => {
                 </div>
               </div>
 
-              {/* Price Calculator */}
               {days > 0 && (
                 <div className="bg-white/5 rounded-2xl p-4 mb-4 border border-white/5">
                   <div className="flex justify-between text-sm text-gray-400 mb-2">
-                    <span>₹{item?.pricePerDay} × {days} days</span>
-                    <span>₹{totalAmount}</span>
+                    <span>Rs.{item?.pricePerDay} x {days} days</span>
+                    <span>Rs.{totalAmount}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-400 mb-3">
                     <span>Security Deposit</span>
-                    <span>₹{item?.securityDeposit}</span>
+                    <span>Rs.{item?.securityDeposit}</span>
                   </div>
                   <div className="flex justify-between font-bold border-t border-white/10 pt-3">
                     <span>Total</span>
                     <span className="gradient-text text-lg">
-                      ₹{totalAmount + (item?.securityDeposit || 0)}
+                      Rs.{totalAmount + (item?.securityDeposit || 0)}
                     </span>
                   </div>
                 </div>
@@ -440,7 +424,7 @@ const ItemDetail = () => {
                 disabled={booking}
                 className="w-full btn-gradient py-3 rounded-xl font-semibold text-lg glow-orange"
               >
-                {booking ? "Sending Request..." : "🚀 Request to Rent"}
+                {booking ? "Sending Request..." : "Request to Rent"}
               </button>
             </div>
           </motion.div>
